@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { to: "/admin/dashboard", label: "Dashboard" },
   { to: "/admin/branches", label: "Branches" },
   { to: "/admin/services", label: "Services" },
-  // Subscription link gets added here in the next step.
+  { to: "/admin/subscription", label: "Subscription" },
 ];
 
 function AdminLayout() {

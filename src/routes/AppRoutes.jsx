@@ -5,6 +5,7 @@ import CustomerRegisterPage from "../pages/auth/CustomerRegisterPage";
 import DashboardPage from "../pages/admin/DashboardPage";
 import BranchesPage from "../pages/admin/BranchesPage";
 import ServicesPage from "../pages/admin/ServicesPage";
+import SubscriptionPage from "../pages/admin/SubscriptionPage";
 import PlatformPage from "../pages/admin/PlatformPage";
 import QueueConsolePage from "../pages/staff/QueueConsolePage";
 import CustomerHomePage from "../pages/customer/HomePage";
@@ -48,6 +49,7 @@ function AppRoutes() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="branches" element={<BranchesPage />} />
         <Route path="services" element={<ServicesPage />} />
+        <Route path="subscription" element={<SubscriptionPage />} />
       </Route>
 
       <Route
