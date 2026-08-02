@@ -13,9 +13,9 @@ import LogoutButton from "../components/LogoutButton";
 // idiomatic way to do a layout route in React Router v6+.
 const NAV_ITEMS = [
   { to: "/admin/dashboard", label: "Dashboard" },
-  // Branches, Services, and Subscription links get added here in later
-  // steps once those pages exist — no point linking to a page that isn't
-  // built yet.
+  { to: "/admin/branches", label: "Branches" },
+  { to: "/admin/services", label: "Services" },
+  // Subscription link gets added here in the next step.
 ];
 
 function AdminLayout() {
