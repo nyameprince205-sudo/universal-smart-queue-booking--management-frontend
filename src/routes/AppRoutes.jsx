@@ -9,6 +9,8 @@ import SubscriptionPage from "../pages/admin/SubscriptionPage";
 import PlatformPage from "../pages/admin/PlatformPage";
 import QueueConsolePage from "../pages/staff/QueueConsolePage";
 import CustomerHomePage from "../pages/customer/HomePage";
+import OrgBookingPage from "../pages/customer/OrgBookingPage";
+import MyBookingsPage from "../pages/customer/MyBookingsPage";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ProtectedRoute from "./ProtectedRoute";
@@ -36,6 +38,20 @@ function AppRoutes() {
       <Route path="/customer/login" element={<CustomerLoginPage />} />
       <Route path="/customer/register" element={<CustomerRegisterPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      {/* /book/:slug is public on purpose — see the comment on CustomerHomePage
+          about there being no organization directory. Anyone with a specific
+          business's link can view it; only submitting a booking requires login,
+          which OrgBookingPage itself handles rather than a ProtectedRoute wrapper. */}
+      <Route path="/book/:slug" element={<OrgBookingPage />} />
+
+      <Route
+        path="/my-bookings"
+        element={
+          <ProtectedRoute authType="customer">
+            <MyBookingsPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Org Admin — shared sidebar layout, nested routes */}
       <Route

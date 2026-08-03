@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 function CustomerRegisterPage() {
   const { registerCustomer } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -22,7 +23,12 @@ function CustomerRegisterPage() {
       // null) — send it as null rather than an empty string so a blank
       // field doesn't get stored as a real-but-empty value.
       await registerCustomer(name, phone, email || null, password);
-      navigate("/", { replace: true });
+      // Same pattern as CustomerLoginPage — a customer who lands here from
+      // a specific org's booking page (because they didn't have an account
+      // yet) should end up back on THAT page after registering, not always
+      // dumped on the generic home page.
+      const destination = location.state?.from?.pathname || "/";
+      navigate(destination, { replace: true });
     } catch (err) {
       // 409 here specifically means "this phone number is already
       // registered" (see customer.controller.js) — surface that distinctly
