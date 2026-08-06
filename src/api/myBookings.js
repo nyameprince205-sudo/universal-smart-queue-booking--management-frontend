@@ -15,4 +15,14 @@ async function cancelMyBooking(id) {
   return data;
 }
 
-export { listMyBookings, createMyBooking, cancelMyBooking };
+// Task 4: no auth at all — lives alongside the authenticated functions
+// above because it's the same booking domain (matches how booking.routes.js
+// groups /bookings/guest with /bookings/mine server-side too), just a
+// different auth requirement. Takes the guest's name/phone/email directly
+// in the payload since there's no JWT to read an identity from.
+async function createGuestBooking(payload) {
+  const { data } = await apiClient.post("/bookings/guest", payload);
+  return data;
+}
+
+export { listMyBookings, createMyBooking, cancelMyBooking, createGuestBooking };

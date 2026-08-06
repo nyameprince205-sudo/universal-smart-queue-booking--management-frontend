@@ -2,6 +2,11 @@ import { Routes, Route } from "react-router-dom";
 import StaffLoginPage from "../pages/auth/StaffLoginPage";
 import CustomerLoginPage from "../pages/auth/CustomerLoginPage";
 import CustomerRegisterPage from "../pages/auth/CustomerRegisterPage";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
+import CustomerForgotPasswordPage from "../pages/auth/CustomerForgotPasswordPage";
+import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
+import VerifyEmailPage from "../pages/auth/VerifyEmailPage";
+import ResendVerificationPage from "../pages/auth/ResendVerificationPage";
 import DashboardPage from "../pages/admin/DashboardPage";
 import BranchesPage from "../pages/admin/BranchesPage";
 import ServicesPage from "../pages/admin/ServicesPage";
@@ -38,6 +43,17 @@ function AppRoutes() {
       <Route path="/customer/login" element={<CustomerLoginPage />} />
       <Route path="/customer/register" element={<CustomerRegisterPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+      {/* Tasks 1/2/3: forgot/reset password + email verification. All public
+          — someone who's locked out or unverified has no session to protect
+          these routes with in the first place. */}
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/customer/forgot-password" element={<CustomerForgotPasswordPage />} />
+      {/* SHARED between staff and customer resets — see ResetPasswordPage's
+          own comment for why one page/route serves both account types. */}
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/resend-verification" element={<ResendVerificationPage />} />
       {/* /book/:slug is public on purpose — see the comment on CustomerHomePage
           about there being no organization directory. Anyone with a specific
           business's link can view it; only submitting a booking requires login,
