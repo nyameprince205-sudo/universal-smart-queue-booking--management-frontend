@@ -74,45 +74,61 @@ function MyBookingsPage() {
         {!loading && bookings.length === 0 && !error && (
           <p className="text-slate-400">
             No bookings yet.{" "}
-            <Link to="/" className="text-sky-600 hover:underline">
-              Head back home
+            <Link to="/organizations" className="text-sky-600 hover:underline">
+              Find a business
             </Link>{" "}
-            to find a business's booking link.
+            to book your first one.
           </p>
         )}
 
         <div className="space-y-3">
-          {bookings.map((booking) => (
-            <div key={booking.id} className="bg-white rounded-lg border border-slate-200 p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-medium text-slate-800">{booking.organization?.name}</p>
-                  <p className="text-sm text-slate-500">
-                    {booking.service?.name} · {booking.branch?.name}
-                  </p>
-                  <p className="text-sm text-slate-500 mt-1">
-                    {new Date(booking.bookingDate).toLocaleDateString()} at {booking.bookingTime}
-                  </p>
+          {bookings.map((booking) => {
+            // Phase 16 addition: a checked-in booking has a real live queue
+            // ticket behind it (see booking.controller.js's listMyBookings) —
+            // this is the ONLY place in the app a logged-in customer can
+            // reach their live tracking page from, other than the SMS link
+            // sent at check-in time, which is easy to lose.
+            const ticket = booking.queueTickets?.[0];
+            return (
+              <div key={booking.id} className="bg-white rounded-lg border border-slate-200 p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-medium text-slate-800">{booking.organization?.name}</p>
+                    <p className="text-sm text-slate-500">
+                      {booking.service?.name} · {booking.branch?.name}
+                    </p>
+                    <p className="text-sm text-slate-500 mt-1">
+                      {new Date(booking.bookingDate).toLocaleDateString()} at {booking.bookingTime}
+                    </p>
+                  </div>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
+                      STATUS_STYLES[booking.status] || "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    {booking.status.replace("_", " ")}
+                  </span>
                 </div>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${
-                    STATUS_STYLES[booking.status] || "bg-slate-100 text-slate-500"
-                  }`}
-                >
-                  {booking.status.replace("_", " ")}
-                </span>
+
+                <div className="mt-3 flex items-center gap-4">
+                  {ticket && (
+                    <Link to={`/track/${ticket.uuid}`} className="text-sm text-sky-600 hover:underline">
+                      Track live status ({ticket.ticketNumber})
+                    </Link>
+                  )}
+                  {CANCELLABLE_STATUSES.includes(booking.status) && (
+                    <button
+                      onClick={() => handleCancel(booking)}
+                      disabled={cancelingId === booking.id}
+                      className="text-sm text-red-600 hover:underline disabled:opacity-50"
+                    >
+                      {cancelingId === booking.id ? "Cancelling…" : "Cancel booking"}
+                    </button>
+                  )}
+                </div>
               </div>
-              {CANCELLABLE_STATUSES.includes(booking.status) && (
-                <button
-                  onClick={() => handleCancel(booking)}
-                  disabled={cancelingId === booking.id}
-                  className="mt-3 text-sm text-red-600 hover:underline disabled:opacity-50"
-                >
-                  {cancelingId === booking.id ? "Cancelling…" : "Cancel booking"}
-                </button>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

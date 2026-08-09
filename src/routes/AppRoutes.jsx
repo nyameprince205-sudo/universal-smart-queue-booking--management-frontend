@@ -21,6 +21,8 @@ import NotFoundPage from "../pages/NotFoundPage";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import StaffPage from "../pages/admin/StaffPage";
+import TrackTicketPage from "../pages/customer/TrackTicketPage";
+import OrganizationSearchPage from "../pages/customer/OrganizationSearchPage";
 
 // Still mostly a flat list, EXCEPT for /admin/*, which is now nested under
 // <AdminLayout> — that's the first shared layout in the app (sidebar +
@@ -60,6 +62,8 @@ function AppRoutes() {
           business's link can view it; only submitting a booking requires login,
           which OrgBookingPage itself handles rather than a ProtectedRoute wrapper. */}
       <Route path="/book/:slug" element={<OrgBookingPage />} />
+      <Route path="/track/:uuid" element={<TrackTicketPage />} />
+      <Route path="/organizations" element={<OrganizationSearchPage />} />
 
       <Route
         path="/my-bookings"
