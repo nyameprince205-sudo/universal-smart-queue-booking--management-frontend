@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { to: "/admin/branches", label: "Branches" },
   { to: "/admin/services", label: "Services" },
   { to: "/admin/subscription", label: "Subscription" },
+  { to: "/admin/staff", label: "Staff" },
 ];
 
 function AdminLayout() {
@@ -32,12 +33,14 @@ function AdminLayout() {
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
+              
               to={item.to}
               className={({ isActive }) =>
                 `block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   isActive ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700/50"
                 }`
               }
+              
             >
               {item.label}
             </NavLink>

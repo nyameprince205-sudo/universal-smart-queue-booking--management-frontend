@@ -20,6 +20,7 @@ import UnauthorizedPage from "../pages/UnauthorizedPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminLayout from "../layouts/AdminLayout";
+import StaffPage from "../pages/admin/StaffPage";
 
 // Still mostly a flat list, EXCEPT for /admin/*, which is now nested under
 // <AdminLayout> — that's the first shared layout in the app (sidebar +
@@ -81,6 +82,7 @@ function AppRoutes() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="branches" element={<BranchesPage />} />
         <Route path="services" element={<ServicesPage />} />
+        <Route path="staff" element={<StaffPage />} />
         <Route path="subscription" element={<SubscriptionPage />} />
       </Route>
 
