@@ -8,6 +8,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getHomeDashboard } from "../../api/analytics";
 import { formatDuration } from "../../utils/formatDuration";
+import ActivityFeed from "../../components/ActivityFeed";
 
 // Phase 18 Module 3: refreshes automatically every 30s rather than
 // requiring a manual reload — see ExecutiveDashboardPage.jsx for the same
@@ -197,6 +198,10 @@ function DashboardPage() {
             </BarChart>
           </ResponsiveContainer>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <ActivityFeed />
       </div>
     </div>
   );

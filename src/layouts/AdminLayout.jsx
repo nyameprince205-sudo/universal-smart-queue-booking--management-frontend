@@ -5,6 +5,7 @@ import {
   Gauge, FileText, CreditCard, Settings, LifeBuoy, ChevronsLeft, ChevronsRight,
 } from "lucide-react";
 import ProfileDropdown from "../components/ProfileDropdown";
+import NotificationBell from "../components/NotificationBell";
 
 // Phase 18, Module 7. Icons + collapse/expand are new; active-menu
 // highlighting already existed (NavLink's isActive), so that part is
@@ -42,9 +43,12 @@ function AdminLayout() {
       <aside className={`bg-slate-800 text-slate-200 flex flex-col shrink-0 transition-all ${collapsed ? "w-16" : "w-56"}`}>
         <div className="px-3 py-4 border-b border-slate-700 flex items-center justify-between">
           {!collapsed && <p className="text-xs font-medium tracking-wide text-slate-400 uppercase pl-2">Org Admin</p>}
-          <button onClick={toggleCollapsed} className="p-1.5 rounded-md hover:bg-slate-700/50 text-slate-400 shrink-0">
-            {collapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center gap-1">
+            <NotificationBell />
+            <button onClick={toggleCollapsed} className="p-1.5 rounded-md hover:bg-slate-700/50 text-slate-400 shrink-0">
+              {collapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
 
         <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
