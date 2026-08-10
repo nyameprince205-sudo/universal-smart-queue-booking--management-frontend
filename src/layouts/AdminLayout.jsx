@@ -17,6 +17,8 @@ const NAV_ITEMS = [
   { to: "/admin/services", label: "Services" },
   { to: "/admin/subscription", label: "Subscription" },
   { to: "/admin/staff", label: "Staff" },
+  { to: "/admin/analytics", label: "Analytics" },
+  { to: "/admin/executive", label: "Executive" },
 ];
 
 function AdminLayout() {
