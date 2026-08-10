@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import StaffLoginPage from "../pages/auth/StaffLoginPage";
 import CustomerLoginPage from "../pages/auth/CustomerLoginPage";
@@ -7,12 +8,6 @@ import CustomerForgotPasswordPage from "../pages/auth/CustomerForgotPasswordPage
 import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 import VerifyEmailPage from "../pages/auth/VerifyEmailPage";
 import ResendVerificationPage from "../pages/auth/ResendVerificationPage";
-import DashboardPage from "../pages/admin/DashboardPage";
-import BranchesPage from "../pages/admin/BranchesPage";
-import ServicesPage from "../pages/admin/ServicesPage";
-import SubscriptionPage from "../pages/admin/SubscriptionPage";
-import PlatformPage from "../pages/admin/PlatformPage";
-import QueueConsolePage from "../pages/staff/QueueConsolePage";
 import CustomerHomePage from "../pages/customer/HomePage";
 import OrgBookingPage from "../pages/customer/OrgBookingPage";
 import MyBookingsPage from "../pages/customer/MyBookingsPage";
@@ -20,14 +15,51 @@ import UnauthorizedPage from "../pages/UnauthorizedPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminLayout from "../layouts/AdminLayout";
-import StaffPage from "../pages/admin/StaffPage";
 import TrackTicketPage from "../pages/customer/TrackTicketPage";
 import OrganizationSearchPage from "../pages/customer/OrganizationSearchPage";
-import AnalyticsPage from "../pages/admin/AnalyticsPage";
-import ExecutiveDashboardPage from "../pages/admin/ExecutiveDashboardPage";
-import BookingsPage from "../pages/admin/BookingsPage";
-import ReportsPage from "../pages/admin/ReportsPage";
-import SettingsPage from "../pages/admin/SettingsPage";
+
+// Phase 18, Module 13: everything below is lazy — every one of these pages
+// lives behind a staff/admin login (ProtectedRoute), so a guest customer
+// browsing /book/:slug or a fresh visitor hitting the homepage was ALWAYS
+// downloading this entire admin bundle (charts, tables, the works) despite
+// having zero chance of ever seeing any of it without logging in first.
+// Splitting these into their own chunks means that JS only downloads the
+// moment someone actually navigates to an admin page — never before.
+const DashboardPage = lazy(() => import("../pages/admin/DashboardPage"));
+const BranchesPage = lazy(() => import("../pages/admin/BranchesPage"));
+const ServicesPage = lazy(() => import("../pages/admin/ServicesPage"));
+const SubscriptionPage = lazy(() => import("../pages/admin/SubscriptionPage"));
+const PlatformPage = lazy(() => import("../pages/admin/PlatformPage"));
+const QueueConsolePage = lazy(() => import("../pages/staff/QueueConsolePage"));
+const StaffPage = lazy(() => import("../pages/admin/StaffPage"));
+const AnalyticsPage = lazy(() => import("../pages/admin/AnalyticsPage"));
+const ExecutiveDashboardPage = lazy(() => import("../pages/admin/ExecutiveDashboardPage"));
+const BookingsPage = lazy(() => import("../pages/admin/BookingsPage"));
+const ReportsPage = lazy(() => import("../pages/admin/ReportsPage"));
+const SettingsPage = lazy(() => import("../pages/admin/SettingsPage"));
+
+// A small, deliberately quiet fallback — this shows for a fraction of a
+// second on a normal connection, not a full loading-screen production;
+// matches the plain "Loading…" text already used throughout this app's
+// own pages (DashboardPage, AnalyticsPage, etc.) rather than introducing
+// a different loading convention just for this.
+function PageLoading() {
+  return <div className="p-8 text-slate-400">Loading…</div>;
+}
+
+// Wraps a single lazy page in its OWN Suspense boundary, scoped to just
+// that route's element — not one giant Suspense around the whole <Routes>
+// tree, which would flash the ENTIRE app (sidebar included) blank on every
+// navigation between two admin pages. Because AdminLayout renders its
+// children through <Outlet />, this boundary only ever covers the main
+// content area; the sidebar stays mounted and interactive throughout.
+function Lazy({ Component }) {
+  return (
+    <Suspense fallback={<PageLoading />}>
+      <Component />
+    </Suspense>
+  );
+}
 
 // Still mostly a flat list, EXCEPT for /admin/*, which is now nested under
 // <AdminLayout> — that's the first shared layout in the app (sidebar +
@@ -79,7 +111,9 @@ function AppRoutes() {
         }
       />
 
-      {/* Org Admin — shared sidebar layout, nested routes */}
+      {/* Org Admin — shared sidebar layout, nested routes. Every page below
+          is lazy (see the top of this file) — none of it downloads until
+          someone actually lands on /admin/* while logged in. */}
       <Route
         path="/admin"
         element={
@@ -88,24 +122,23 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="branches" element={<BranchesPage />} />
-        <Route path="services" element={<ServicesPage />} />
-        <Route path="staff" element={<StaffPage />} />
-        <Route path="subscription" element={<SubscriptionPage />} />
-        <Route path="analytics" element={<AnalyticsPage />} />
-        <Route path="executive" element={<ExecutiveDashboardPage />} />
-        <Route path="bookings" element={<BookingsPage />} />
-        <Route path="reports" element={<ReportsPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-        
+        <Route path="dashboard" element={<Lazy Component={DashboardPage} />} />
+        <Route path="branches" element={<Lazy Component={BranchesPage} />} />
+        <Route path="services" element={<Lazy Component={ServicesPage} />} />
+        <Route path="staff" element={<Lazy Component={StaffPage} />} />
+        <Route path="subscription" element={<Lazy Component={SubscriptionPage} />} />
+        <Route path="analytics" element={<Lazy Component={AnalyticsPage} />} />
+        <Route path="executive" element={<Lazy Component={ExecutiveDashboardPage} />} />
+        <Route path="bookings" element={<Lazy Component={BookingsPage} />} />
+        <Route path="reports" element={<Lazy Component={ReportsPage} />} />
+        <Route path="settings" element={<Lazy Component={SettingsPage} />} />
       </Route>
 
       <Route
         path="/platform"
         element={
           <ProtectedRoute authType="staff" allowedRoles={["SUPER_ADMIN"]}>
-            <PlatformPage />
+            <Lazy Component={PlatformPage} />
           </ProtectedRoute>
         }
       />
@@ -113,7 +146,7 @@ function AppRoutes() {
         path="/staff/queue"
         element={
           <ProtectedRoute authType="staff" allowedRoles={["STAFF", "ORG_ADMIN"]}>
-            <QueueConsolePage />
+            <Lazy Component={QueueConsolePage} />
           </ProtectedRoute>
         }
       />
