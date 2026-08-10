@@ -1,10 +1,5 @@
 import apiClient from "./client";
 
-// listPlans is the only PUBLIC endpoint here (no auth needed to see
-// pricing) — but calling it through the same authenticated apiClient is
-// still fine, since the request interceptor only ATTACHES a token if one
-// exists; it doesn't require one.
-
 async function listPlans() {
   const { data } = await apiClient.get("/subscriptions/plans");
   return data;
@@ -25,4 +20,11 @@ async function verifyPayment(reference) {
   return data;
 }
 
-export { listPlans, getMySubscription, initializeSubscription, verifyPayment };
+// Phase 18, Module 6 addition — the backend endpoint (Payment table)
+// already existed since Phase 13; nothing read it back until now.
+async function listPaymentHistory() {
+  const { data } = await apiClient.get("/subscriptions/payments");
+  return data;
+}
+
+export { listPlans, getMySubscription, initializeSubscription, verifyPayment, listPaymentHistory };

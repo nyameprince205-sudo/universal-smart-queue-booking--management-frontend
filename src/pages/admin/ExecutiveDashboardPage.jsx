@@ -1,17 +1,88 @@
 import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { Users, CheckCircle2, UserCog, Gauge, TrendingUp, TrendingDown } from "lucide-react";
 import { getExecutiveSummary } from "../../api/analytics";
 import StatCard from "../../components/StatCard";
 import { formatDuration } from "../../utils/formatDuration";
 
-// Module 7: deliberately no date range picker anywhere on this page — this
-// is a "what's happening right now" view (live queues, who's currently
-// serving), not a historical report. Polls every 30s rather than wiring
-// into Socket.IO — a genuinely live-second-by-second feed would need new
-// broadcast events across the whole org (every branch, not just one),
-// which is real added complexity an executive summary doesn't need;
-// "refreshes automatically every half minute" is close enough for a
-// dashboard someone glances at, not a live queue board a customer stares at.
 const REFRESH_INTERVAL_MS = 30000;
+
+// Phase 18, Module 10: one branch = one card, replacing the old
+// branch-ranking TABLE. "Clicking a branch opens its analytics dashboard"
+// per the spec — links to /admin/analytics rather than a branch-specific
+// filtered view, since AnalyticsPage doesn't support pre-selecting a
+// branch yet (a real, flagged limitation, not silently dropped).
+function BranchCard({ branch }) {
+  return (
+    <Link
+      to="/admin/analytics"
+      className={`block rounded-lg border p-4 hover:border-sky-300 transition-colors ${
+        branch.overloaded ? "bg-red-50 border-red-200" : "bg-white border-slate-200"
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <p className="font-medium text-slate-800">{branch.branchName}</p>
+        <span className={`w-2 h-2 rounded-full ${branch.overloaded ? "bg-red-500" : "bg-green-500"}`} />
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+        <div>
+          <p className="text-slate-400">Waiting</p>
+          <p className="font-semibold text-slate-800">{branch.customersWaiting}</p>
+        </div>
+        <div>
+          <p className="text-slate-400">Served today</p>
+          <p className="font-semibold text-slate-800">{branch.ticketsServedToday}</p>
+        </div>
+        <div>
+          <p className="text-slate-400">Bookings today</p>
+          <p className="font-semibold text-slate-800">{branch.bookingsToday}</p>
+        </div>
+        <div>
+          <p className="text-slate-400">Staff available</p>
+          <p className="font-semibold text-slate-800">{branch.staffAvailable}</p>
+        </div>
+        <div>
+          <p className="text-slate-400">Avg wait</p>
+          <p className="font-semibold text-slate-800">{formatDuration(branch.averageWaitTimeSeconds)}</p>
+        </div>
+        <div>
+          <p className="text-slate-400">Queue efficiency</p>
+          <p className="font-semibold text-slate-800">
+            {branch.queueEfficiencyPercent != null ? `${branch.queueEfficiencyPercent}%` : "—"}
+          </p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// Phase 18, Module 11. A small, generic "highlight card" — growth rate,
+// best branch, best staff, etc. all fit the same "label + headline value +
+// optional detail line" shape, so one component covers all of them
+// instead of a bespoke card per fact.
+function SummaryCard({ label, value, detail, icon: Icon }) {
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 p-4">
+      <div className="flex items-center gap-2 text-slate-400">
+        {Icon && <Icon className="w-4 h-4" />}
+        <p className="text-xs font-medium">{label}</p>
+      </div>
+      <p className="mt-1 text-lg font-semibold text-slate-800">{value}</p>
+      {detail && <p className="text-xs text-slate-500">{detail}</p>}
+    </div>
+  );
+}
+
+function GrowthValue({ percent }) {
+  if (percent == null) return <span className="text-slate-400">—</span>;
+  const Icon = percent >= 0 ? TrendingUp : TrendingDown;
+  const color = percent >= 0 ? "text-green-600" : "text-red-600";
+  return (
+    <span className={`inline-flex items-center gap-1 ${color}`}>
+      <Icon className="w-4 h-4" /> {Math.abs(percent)}%
+    </span>
+  );
+}
 
 function ExecutiveDashboardPage() {
   const [summary, setSummary] = useState(null);
@@ -51,6 +122,8 @@ function ExecutiveDashboardPage() {
       </div>
     );
   }
+
+  const { summary: extras } = summary;
 
   return (
     <div className="p-8 max-w-5xl">
@@ -92,52 +165,51 @@ function ExecutiveDashboardPage() {
         <StatCard label="Revenue" value={`GHS ${summary.today.revenue.toFixed(2)}`} />
       </div>
 
-      <div className="mt-6 grid sm:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-          <p className="text-sm font-medium text-slate-500 px-5 pt-5 pb-3">Branch Ranking (today)</p>
+      {/* Module 11: Executive Summary */}
+      <p className="mt-6 text-sm font-medium text-slate-500">Executive Summary</p>
+      <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <SummaryCard label="Weekly Growth" value={<GrowthValue percent={extras.weeklyGrowthPercent} />} detail="bookings vs last week" icon={TrendingUp} />
+        <SummaryCard label="Monthly Growth" value={<GrowthValue percent={extras.monthlyGrowthPercent} />} detail="bookings vs last month" icon={TrendingUp} />
+        <SummaryCard label="Best Performing Branch" value={extras.bestBranch?.branchName || "—"} detail={extras.bestBranch ? `${extras.bestBranch.ticketsServedToday} served today` : undefined} icon={Users} />
+        <SummaryCard label="Best Staff" value={extras.bestStaff?.name || "—"} detail={extras.bestStaff ? `${extras.bestStaff.completed} completed today` : undefined} icon={UserCog} />
+        <SummaryCard label="Most Requested Service" value={extras.mostRequestedService?.serviceName || "—"} detail={extras.mostRequestedService ? `${extras.mostRequestedService.count} bookings today` : undefined} icon={CheckCircle2} />
+        <SummaryCard label="Highest / Lowest Wait" value={extras.highestWaitBranch ? `${extras.highestWaitBranch.branchName}` : "—"} detail={extras.lowestWaitBranch ? `Lowest: ${extras.lowestWaitBranch.branchName}` : undefined} icon={Gauge} />
+      </div>
+
+      {/* Module 10: Branch Performance Cards */}
+      {summary.branchRanking.length > 0 && (
+        <>
+          <p className="mt-6 text-sm font-medium text-slate-500">Branch Performance</p>
+          <div className="mt-2 grid sm:grid-cols-2 gap-4">
+            {summary.branchRanking.map((branch) => (
+              <BranchCard key={branch.branchId} branch={branch} />
+            ))}
+          </div>
+        </>
+      )}
+
+      <div className="mt-6 bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <p className="text-sm font-medium text-slate-500 px-5 pt-5 pb-3">Service Ranking (today)</p>
+        {summary.serviceRanking.length === 0 ? (
+          <p className="text-sm text-slate-400 px-5 pb-5">No completed bookings yet today.</p>
+        ) : (
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
-                <th className="px-5 py-2 font-medium">Branch</th>
-                <th className="px-5 py-2 font-medium">Waiting</th>
-                <th className="px-5 py-2 font-medium">Served</th>
+                <th className="px-5 py-2 font-medium">Service</th>
+                <th className="px-5 py-2 font-medium">Bookings</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {summary.branchRanking.map((b) => (
-                <tr key={b.branchId} className={b.overloaded ? "bg-red-50" : ""}>
-                  <td className="px-5 py-2 font-medium text-slate-800">{b.branchName}</td>
-                  <td className="px-5 py-2 text-slate-600">{b.customersWaiting}</td>
-                  <td className="px-5 py-2 text-slate-600">{b.ticketsServedToday}</td>
+              {summary.serviceRanking.map((s) => (
+                <tr key={s.serviceId}>
+                  <td className="px-5 py-2 font-medium text-slate-800">{s.serviceName}</td>
+                  <td className="px-5 py-2 text-slate-600">{s.count}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-          <p className="text-sm font-medium text-slate-500 px-5 pt-5 pb-3">Service Ranking (today)</p>
-          {summary.serviceRanking.length === 0 ? (
-            <p className="text-sm text-slate-400 px-5 pb-5">No completed bookings yet today.</p>
-          ) : (
-            <table className="w-full text-sm text-left">
-              <thead className="bg-slate-50 text-slate-500">
-                <tr>
-                  <th className="px-5 py-2 font-medium">Service</th>
-                  <th className="px-5 py-2 font-medium">Bookings</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {summary.serviceRanking.map((s) => (
-                  <tr key={s.serviceId}>
-                    <td className="px-5 py-2 font-medium text-slate-800">{s.serviceName}</td>
-                    <td className="px-5 py-2 text-slate-600">{s.count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
