@@ -46,8 +46,14 @@ async function getExecutiveSummary() {
   return data;
 }
 
+async function getHomeDashboard() {
+  const { data } = await apiClient.get("/analytics/home-dashboard");
+  return data;
+}
+
 export {
   getServicePopularity,
+  getHomeDashboard,
   getPeakHours,
   getBookingTrends,
   getStaffPerformance,
