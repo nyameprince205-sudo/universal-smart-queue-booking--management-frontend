@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { listStaff, createStaff } from "../../api/staff";
+import { listStaff, createStaff, deactivateStaff, reactivateStaff } from "../../api/staff";
 import { listBranches } from "../../api/branches";
 import Modal from "../../components/Modal";
 
@@ -96,6 +96,7 @@ function StaffPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [actioningId, setActioningId] = useState(null);
 
   const loadAll = useCallback(async () => {
     setLoading(true);
@@ -119,6 +120,27 @@ function StaffPage() {
     await createStaff(values);
     setShowAddModal(false);
     await loadAll();
+  }
+
+  // Deactivating asks for confirmation (this locks the person out
+  // immediately, per the backend's login check) — reactivating doesn't,
+  // since it's the reversible/low-stakes direction of this same toggle.
+  async function handleToggleStatus(member) {
+    const isActive = member.status === "active";
+    if (isActive && !window.confirm(`Deactivate ${member.name}? They won't be able to log in until reactivated.`)) {
+      return;
+    }
+    setActioningId(member.id);
+    setError(null);
+    try {
+      if (isActive) await deactivateStaff(member.id);
+      else await reactivateStaff(member.id);
+      await loadAll();
+    } catch (err) {
+      setError(err.response?.data?.error || "Couldn't update this staff member.");
+    } finally {
+      setActioningId(null);
+    }
   }
 
   return (
@@ -151,26 +173,51 @@ function StaffPage() {
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Branch</th>
+                <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Verified</th>
+                <th className="px-4 py-3 font-medium"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {staff.map((s) => (
-                <tr key={s.id}>
-                  <td className="px-4 py-3 font-medium text-slate-800">{s.name}</td>
-                  <td className="px-4 py-3 text-slate-500">{s.email}</td>
-                  <td className="px-4 py-3 text-slate-500">{s.branchName || "Not branch-scoped"}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                        s.emailVerified ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
-                      }`}
-                    >
-                      {s.emailVerified ? "Verified" : "Pending"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {staff.map((s) => {
+                const isActive = s.status === "active";
+                return (
+                  <tr key={s.id} className={isActive ? "" : "bg-slate-50"}>
+                    <td className="px-4 py-3 font-medium text-slate-800">{s.name}</td>
+                    <td className="px-4 py-3 text-slate-500">{s.email}</td>
+                    <td className="px-4 py-3 text-slate-500">{s.branchName || "Not branch-scoped"}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          isActive ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-600"
+                        }`}
+                      >
+                        {isActive ? "Active" : "Deactivated"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                          s.emailVerified ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {s.emailVerified ? "Verified" : "Pending"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => handleToggleStatus(s)}
+                        disabled={actioningId === s.id}
+                        className={`text-sm font-medium hover:underline disabled:opacity-50 ${
+                          isActive ? "text-red-600" : "text-sky-600"
+                        }`}
+                      >
+                        {actioningId === s.id ? "Working…" : isActive ? "Deactivate" : "Reactivate"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

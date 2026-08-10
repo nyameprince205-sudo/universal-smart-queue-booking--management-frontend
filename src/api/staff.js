@@ -10,4 +10,14 @@ async function createStaff(payload) {
   return data;
 }
 
-export { listStaff, createStaff };
+async function deactivateStaff(id) {
+  const { data } = await apiClient.patch(`/staff/${id}/deactivate`);
+  return data;
+}
+
+async function reactivateStaff(id) {
+  const { data } = await apiClient.patch(`/staff/${id}/reactivate`);
+  return data;
+}
+
+export { listStaff, createStaff, deactivateStaff, reactivateStaff };
