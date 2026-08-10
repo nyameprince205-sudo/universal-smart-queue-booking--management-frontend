@@ -4,6 +4,7 @@ import { lookupCustomerByPhone, quickRegisterCustomer } from "../../api/customer
 import { listBranches } from "../../api/branches";
 import { listServices } from "../../api/services";
 import Modal from "../../components/Modal";
+import { formatBookingTime } from "../../utils/formatBookingTime";
 
 const STATUS_STYLES = {
   pending: "bg-amber-100 text-amber-700",
@@ -203,7 +204,7 @@ function BookingsPage() {
                     <p className="text-xs text-slate-400">{b.customer?.phone}</p>
                   </td>
                   <td className="px-4 py-3 text-slate-600">{b.service?.name}</td>
-                  <td className="px-4 py-3 text-slate-600">{new Date(b.bookingDate).toLocaleDateString()} {b.bookingTime}</td>
+                  <td className="px-4 py-3 text-slate-600">{new Date(b.bookingDate).toLocaleDateString()} {formatBookingTime(b.bookingTime)}</td>
                   <td className="px-4 py-3">
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[b.status] || "bg-slate-100 text-slate-500"}`}>
                       {b.status.replace("_", " ")}

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { listMyBookings, cancelMyBooking } from "../../api/myBookings";
 import LogoutButton from "../../components/LogoutButton";
+import { formatBookingTime } from "../../utils/formatBookingTime";
 
 const STATUS_STYLES = {
   pending: "bg-amber-100 text-amber-700",
@@ -98,7 +99,7 @@ function MyBookingsPage() {
                       {booking.service?.name} · {booking.branch?.name}
                     </p>
                     <p className="text-sm text-slate-500 mt-1">
-                      {new Date(booking.bookingDate).toLocaleDateString()} at {booking.bookingTime}
+                      {new Date(booking.bookingDate).toLocaleDateString()} at {formatBookingTime(booking.bookingTime)}
                     </p>
                   </div>
                   <span
