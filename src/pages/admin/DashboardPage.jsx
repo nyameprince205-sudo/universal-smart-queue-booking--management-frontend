@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import {
   Calendar, Ticket, Users, UserCheck, CheckCircle2, Clock, Timer,
   UserCog, Grid3x3, Building2, CalendarCheck, CalendarX, UserX, Gauge,
+  CalendarPlus, UserPlus, FolderPlus, Wrench, FileBarChart, CreditCard,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getHomeDashboard } from "../../api/analytics";
@@ -43,6 +45,40 @@ function KPICard({ label, value, icon: Icon, trendPercent, goodDirection, isLive
       </div>
       <p className="mt-3 text-2xl font-semibold text-slate-800">{value}</p>
       <p className="text-xs text-slate-500 mt-0.5">{label}</p>
+    </div>
+  );
+}
+
+// Phase 18, Module 9. Deliberately NAVIGATES to existing pages rather than
+// opening a duplicate "add" modal here — Branches/Services/Staff/Bookings
+// already have their own working add-forms; a second copy of that same
+// form living on the dashboard would be two places to keep in sync for no
+// real benefit. "Invite Staff" from the spec's example list is the same
+// destination as "Add Staff" (staff.controller.js's createStaff IS the
+// invite), so it isn't listed twice.
+const QUICK_ACTIONS = [
+  { to: "/admin/bookings", label: "Create Booking", icon: CalendarPlus },
+  { to: "/admin/staff", label: "Add Staff", icon: UserPlus },
+  { to: "/admin/branches", label: "Create Branch", icon: FolderPlus },
+  { to: "/admin/services", label: "Create Service", icon: Wrench },
+  { to: "/staff/queue", label: "View Queue", icon: Ticket },
+  { to: "/admin/reports", label: "Generate Report", icon: FileBarChart },
+  { to: "/admin/subscription", label: "Manage Subscription", icon: CreditCard },
+];
+
+function QuickActions() {
+  return (
+    <div className="mt-6 flex gap-3 overflow-x-auto pb-1">
+      {QUICK_ACTIONS.map((action) => (
+        <Link
+          key={action.to + action.label}
+          to={action.to}
+          className="flex items-center gap-2 shrink-0 rounded-md bg-white border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:border-sky-300 hover:text-sky-700 transition-colors"
+        >
+          <action.icon className="w-4 h-4" />
+          {action.label}
+        </Link>
+      ))}
     </div>
   );
 }
@@ -96,6 +132,8 @@ function DashboardPage() {
           Updated {new Date(data.generatedAt).toLocaleTimeString()} · refreshes automatically
         </p>
       </div>
+
+      <QuickActions />
 
       <p className="mt-6 text-sm font-medium text-slate-500">Live Right Now</p>
       <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-4">

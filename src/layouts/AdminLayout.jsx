@@ -1,55 +1,87 @@
+import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import LogoutButton from "../components/LogoutButton";
+import {
+  LayoutDashboard, Calendar, Ticket, Building2, Wrench, UserCog, BarChart3,
+  Gauge, FileText, CreditCard, Settings, LifeBuoy, ChevronsLeft, ChevronsRight,
+} from "lucide-react";
+import ProfileDropdown from "../components/ProfileDropdown";
 
-// This is the first layout in the app that wraps MULTIPLE pages with a
-// shared sidebar — Step 1/2 deliberately deferred this until there was an
-// actual second page to justify it (see the note this replaced in
-// AppRoutes.jsx). Org Admin is that moment: Reports (this step) plus
-// Branches/Services/Subscription (later steps) all live under here.
-//
-// Uses <Outlet /> — React Router's way of saying "render whichever child
-// route matched" — rather than accepting a `children` prop, which is the
-// idiomatic way to do a layout route in React Router v6+.
+// Phase 18, Module 7. Icons + collapse/expand are new; active-menu
+// highlighting already existed (NavLink's isActive), so that part is
+// unchanged. "Customers" is deliberately NOT in this list — no backend
+// endpoint lists an org's customers yet (see the delivery notes); a nav
+// link to a page that can't load anything is worse than no link at all.
 const NAV_ITEMS = [
-  { to: "/admin/dashboard", label: "Dashboard" },
-  { to: "/admin/branches", label: "Branches" },
-  { to: "/admin/services", label: "Services" },
-  { to: "/admin/subscription", label: "Subscription" },
-  { to: "/admin/staff", label: "Staff" },
-  { to: "/admin/analytics", label: "Analytics" },
-  { to: "/admin/executive", label: "Executive" },
+  { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/admin/bookings", label: "Bookings", icon: Calendar },
+  { to: "/staff/queue", label: "Queue", icon: Ticket },
+  { to: "/admin/branches", label: "Branches", icon: Building2 },
+  { to: "/admin/services", label: "Services", icon: Wrench },
+  { to: "/admin/staff", label: "Staff", icon: UserCog },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/admin/executive", label: "Executive", icon: Gauge },
+  { to: "/admin/reports", label: "Reports", icon: FileText },
+  { to: "/admin/subscription", label: "Subscription", icon: CreditCard },
 ];
 
+const COLLAPSE_STORAGE_KEY = "queueSaasSidebarCollapsed";
+
 function AdminLayout() {
-  const { profile } = useAuth();
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSE_STORAGE_KEY) === "true");
+
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem(COLLAPSE_STORAGE_KEY, String(next));
+      return next;
+    });
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      <aside className="w-56 bg-slate-800 text-slate-200 flex flex-col shrink-0">
-        <div className="px-5 py-5 border-b border-slate-700">
-          <p className="text-xs font-medium tracking-wide text-slate-400 uppercase">Org Admin</p>
-          <p className="mt-1 font-semibold text-white truncate">{profile?.name}</p>
+      <aside className={`bg-slate-800 text-slate-200 flex flex-col shrink-0 transition-all ${collapsed ? "w-16" : "w-56"}`}>
+        <div className="px-3 py-4 border-b border-slate-700 flex items-center justify-between">
+          {!collapsed && <p className="text-xs font-medium tracking-wide text-slate-400 uppercase pl-2">Org Admin</p>}
+          <button onClick={toggleCollapsed} className="p-1.5 rounded-md hover:bg-slate-700/50 text-slate-400 shrink-0">
+            {collapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
+          </button>
         </div>
-        <nav className="flex-1 px-3 py-4 space-y-1">
+
+        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
-              
               to={item.to}
+              title={collapsed ? item.label : undefined}
               className={({ isActive }) =>
-                `block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   isActive ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700/50"
                 }`
               }
-              
             >
-              {item.label}
+              <item.icon className="w-4 h-4 shrink-0" />
+              {!collapsed && <span className="truncate">{item.label}</span>}
             </NavLink>
           ))}
+
+          <a
+            href="mailto:support@queuesaas.example.com"
+            title={collapsed ? "Support" : undefined}
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700/50 transition-colors"
+          >
+            <LifeBuoy className="w-4 h-4 shrink-0" />
+            {!collapsed && <span className="truncate">Support</span>}
+          </a>
         </nav>
-        <div className="px-5 py-4 border-t border-slate-700">
-          <LogoutButton className="text-sm font-medium text-slate-300 hover:text-white transition-colors" />
+
+        <div className="px-2 py-3 border-t border-slate-700">
+          {collapsed ? (
+            <div className="flex justify-center">
+              <Settings className="w-5 h-5 text-slate-400" />
+            </div>
+          ) : (
+            <ProfileDropdown />
+          )}
         </div>
       </aside>
 

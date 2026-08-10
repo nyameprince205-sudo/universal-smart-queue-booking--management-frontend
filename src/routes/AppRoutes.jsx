@@ -25,6 +25,9 @@ import TrackTicketPage from "../pages/customer/TrackTicketPage";
 import OrganizationSearchPage from "../pages/customer/OrganizationSearchPage";
 import AnalyticsPage from "../pages/admin/AnalyticsPage";
 import ExecutiveDashboardPage from "../pages/admin/ExecutiveDashboardPage";
+import BookingsPage from "../pages/admin/BookingsPage";
+import ReportsPage from "../pages/admin/ReportsPage";
+import SettingsPage from "../pages/admin/SettingsPage";
 
 // Still mostly a flat list, EXCEPT for /admin/*, which is now nested under
 // <AdminLayout> — that's the first shared layout in the app (sidebar +
@@ -92,6 +95,10 @@ function AppRoutes() {
         <Route path="subscription" element={<SubscriptionPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="executive" element={<ExecutiveDashboardPage />} />
+        <Route path="bookings" element={<BookingsPage />} />
+        <Route path="reports" element={<ReportsPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+        
       </Route>
 
       <Route
