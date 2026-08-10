@@ -17,7 +17,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import TrackTicketPage from "../pages/customer/TrackTicketPage";
 import OrganizationSearchPage from "../pages/customer/OrganizationSearchPage";
-
+import RequestRegistrationPage from "../pages/customer/RequestRegistrationPage";
+import OrganizationRequestsPage from "../pages/admin/OrganizationRequestsPage";
 // Phase 18, Module 13: everything below is lazy — every one of these pages
 // lives behind a staff/admin login (ProtectedRoute), so a guest customer
 // browsing /book/:slug or a fresh visitor hitting the homepage was ALWAYS
@@ -101,6 +102,7 @@ function AppRoutes() {
       <Route path="/book/:slug" element={<OrgBookingPage />} />
       <Route path="/track/:uuid" element={<TrackTicketPage />} />
       <Route path="/organizations" element={<OrganizationSearchPage />} />
+      <Route path="/request-registration" element={<RequestRegistrationPage />} />
 
       <Route
         path="/my-bookings"
@@ -133,6 +135,15 @@ function AppRoutes() {
         <Route path="reports" element={<Lazy Component={ReportsPage} />} />
         <Route path="settings" element={<Lazy Component={SettingsPage} />} />
       </Route>
+
+<Route
+  path="/organization-requests"
+  element={
+    <ProtectedRoute authType="staff" allowedRoles={["SUPER_ADMIN"]}>
+      <OrganizationRequestsPage />
+    </ProtectedRoute>
+  }
+/>
 
       <Route
         path="/platform"
