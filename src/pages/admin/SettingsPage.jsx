@@ -10,6 +10,13 @@ function SettingsPage() {
   const [phone, setPhone] = useState("");
   const [queuePrefix, setQueuePrefix] = useState("");
   const [timezone, setTimezone] = useState("");
+  // Phase 17, Step 3 additions
+  const [description, setDescription] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [website, setWebsite] = useState("");
+  const [facebook, setFacebook] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [openingHours, setOpeningHours] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [saved, setSaved] = useState(false);
@@ -23,6 +30,12 @@ function SettingsPage() {
         setPhone(data.phone || "");
         setQueuePrefix(data.settings?.queuePrefix || "");
         setTimezone(data.settings?.timezone || "");
+        setDescription(data.description || "");
+        setWhatsapp(data.whatsapp || "");
+        setWebsite(data.website || "");
+        setFacebook(data.facebook || "");
+        setInstagram(data.instagram || "");
+        setOpeningHours(data.openingHours || "");
       })
       .catch((err) => setError(err.response?.data?.error || "Couldn't load organization settings."))
       .finally(() => setLoading(false));
@@ -34,7 +47,10 @@ function SettingsPage() {
     setSaved(false);
     setSaving(true);
     try {
-      const updated = await updateMyOrganization({ name, phone, queuePrefix, timezone });
+      const updated = await updateMyOrganization({
+        name, phone, queuePrefix, timezone,
+        description, whatsapp, website, facebook, instagram, openingHours,
+      });
       setOrg(updated);
       setSaved(true);
     } catch (err) {
@@ -98,6 +114,77 @@ function SettingsPage() {
             type="text"
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800"
+          />
+        </div>
+
+        <hr className="border-slate-200" />
+        <p className="text-sm font-medium text-slate-700">Public Profile</p>
+        <p className="text-xs text-slate-400 -mt-3">
+          Shown on your organization's public booking page — Phase 17.
+        </p>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700">Description</label>
+          <textarea
+            rows={3}
+            maxLength={500}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700">
+            WhatsApp <span className="text-slate-400 font-normal">(international format, no + or spaces, e.g. 233201234567)</span>
+          </label>
+          <input
+            type="text"
+            value={whatsapp}
+            onChange={(e) => setWhatsapp(e.target.value)}
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700">Website</label>
+          <input
+            type="url"
+            placeholder="https://…"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Facebook</label>
+            <input
+              type="text"
+              placeholder="facebook.com/yourpage"
+              value={facebook}
+              onChange={(e) => setFacebook(e.target.value)}
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Instagram</label>
+            <input
+              type="text"
+              placeholder="@yourhandle"
+              value={instagram}
+              onChange={(e) => setInstagram(e.target.value)}
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800"
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700">
+            Opening hours <span className="text-slate-400 font-normal">(free text, e.g. "Mon–Fri: 9am–6pm, Sat: 10am–2pm")</span>
+          </label>
+          <input
+            type="text"
+            value={openingHours}
+            onChange={(e) => setOpeningHours(e.target.value)}
             className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800"
           />
         </div>

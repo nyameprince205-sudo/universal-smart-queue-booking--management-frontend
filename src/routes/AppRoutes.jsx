@@ -21,8 +21,7 @@ import RequestRegistrationPage from "../pages/customer/RequestRegistrationPage";
 import OrganizationRequestsPage from "../pages/admin/OrganizationRequestsPage";
 import AboutPage from "../pages/customer/AboutPage";
 import ContactPage from "../pages/customer/ContactPage";
-
-
+import ContactSubmissionsPage from "../pages/admin/ContactSubmissionsPage";
 // Phase 18, Module 13: everything below is lazy — every one of these pages
 // lives behind a staff/admin login (ProtectedRoute), so a guest customer
 // browsing /book/:slug or a fresh visitor hitting the homepage was ALWAYS
@@ -119,6 +118,15 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+       
+       <Route
+  path="/contact-submissions"
+  element={
+    <ProtectedRoute authType="staff" allowedRoles={["SUPER_ADMIN"]}>
+      <ContactSubmissionsPage />
+    </ProtectedRoute>
+  }
+/>
 
       {/* Org Admin — shared sidebar layout, nested routes. Every page below
           is lazy (see the top of this file) — none of it downloads until

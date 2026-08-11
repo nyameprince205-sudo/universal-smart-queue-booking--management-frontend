@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
+import { Phone, MessageCircle, Globe, Link2, AtSign, Clock, MapPin } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getPublicOrganization } from "../../api/publicOrg";
 import { createMyBooking, createGuestBooking } from "../../api/myBookings";
@@ -217,6 +218,115 @@ function BookingForm({ org, isGuest, onSubmit }) {
   );
 }
 
+// Phase 17, Step 3: everything below is new. Only rendered for fields that
+// actually have a value — an org that hasn't filled in WhatsApp yet simply
+// doesn't show a WhatsApp button, rather than a dead/broken one.
+function OrgProfile({ org }) {
+  const hasAnyContact = org.phone || org.whatsapp || org.website || org.facebook || org.instagram;
+
+  return (
+    <div className="mt-6 bg-white rounded-lg border border-slate-200 p-6">
+      <div className="flex items-center gap-4">
+        {org.logoUrl && (
+          <img src={org.logoUrl} alt={`${org.name} logo`} className="w-14 h-14 rounded-md object-cover border border-slate-200" />
+        )}
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-800">{org.name}</h1>
+          {org.description && <p className="mt-1 text-sm text-slate-500">{org.description}</p>}
+        </div>
+      </div>
+
+      {org.openingHours && (
+        <p className="mt-4 flex items-center gap-2 text-sm text-slate-600">
+          <Clock className="w-4 h-4 text-slate-400 shrink-0" /> {org.openingHours}
+        </p>
+      )}
+
+      {hasAnyContact && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {org.phone && (
+            <a
+              href={`tel:${org.phone}`}
+              className="flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-200 transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5" /> Call
+            </a>
+          )}
+          {org.whatsapp && (
+            <a
+              href={`https://wa.me/${org.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-md bg-green-100 px-3 py-1.5 text-sm text-green-700 hover:bg-green-200 transition-colors"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+            </a>
+          )}
+          {org.website && (
+            <a
+              href={org.website.startsWith("http") ? org.website : `https://${org.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-200 transition-colors"
+            >
+              <Globe className="w-3.5 h-3.5" /> Website
+            </a>
+          )}
+          {org.facebook && (
+            <a
+              href={org.facebook.startsWith("http") ? org.facebook : `https://${org.facebook}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-200 transition-colors"
+            >
+              <Link2 className="w-3.5 h-3.5" /> Facebook
+            </a>
+          )}
+          {org.instagram && (
+            <a
+              href={`https://instagram.com/${org.instagram.replace(/^@/, "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-200 transition-colors"
+            >
+              <AtSign className="w-3.5 h-3.5" /> Instagram
+            </a>
+          )}
+        </div>
+      )}
+
+      {/* Branches — address/phone already existed per-branch in the
+          schema; Get Directions is a Google Maps search built from that
+          address, no geocoding needed. */}
+      {org.branches.length > 0 && (
+        <div className="mt-5 pt-4 border-t border-slate-100">
+          <p className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">Branches</p>
+          <div className="space-y-2">
+            {org.branches.map((b) => (
+              <div key={b.id} className="flex items-center justify-between text-sm">
+                <div>
+                  <p className="text-slate-700 font-medium">{b.name}</p>
+                  {b.address && <p className="text-slate-500">{b.address}</p>}
+                </div>
+                {b.address && (
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-sky-600 hover:underline shrink-0 ml-3"
+                  >
+                    <MapPin className="w-3.5 h-3.5" /> Directions
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function OrgBookingPage() {
   const { slug } = useParams();
   const location = useLocation();
@@ -271,10 +381,13 @@ function OrgBookingPage() {
   return (
     <div className="min-h-screen bg-slate-50 py-10 px-4">
       <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-semibold text-slate-800">{org.name}</h1>
+        {/* Phase 17, Step 3: the profile section now carries the org name
+            and description — the old bare <h1>{org.name}</h1> that used to
+            sit here is gone, folded into OrgProfile instead. */}
+        <OrgProfile org={org} />
 
         {!isLoggedInCustomer && (
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-4 text-sm text-slate-500">
             Booking as a guest below.{" "}
             <Link to="/customer/login" state={{ from: location }} className="text-sky-600 hover:underline">
               Sign in
