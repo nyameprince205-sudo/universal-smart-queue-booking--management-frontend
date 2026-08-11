@@ -2,8 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { searchOrganizations } from "../../api/publicOrg";
 import Navbar from "../../components/Navbar";
-
-// Module 3: the piece that lets a customer FIND a business — a hospital, a
+import useDocumentTitle from "../../hooks/useDocumentTitle";// Module 3: the piece that lets a customer FIND a business — a hospital, a
 // bank, a salon — by name, from inside the app itself, rather than needing
 // an already-shared /book/:slug link to get anywhere. Public: no login
 // required to browse, same as the booking page itself once you get there.
@@ -15,6 +14,7 @@ import Navbar from "../../components/Navbar";
 function OrganizationSearchPage() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  useDocumentTitle(search ? `Search: ${search}` : "Find a Business");
   const [organizations, setOrganizations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

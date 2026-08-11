@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { searchOrganizations } from "../../api/publicOrg";
 import Navbar from "../../components/Navbar";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 
 // Phase 17, Step 2. The old version of this page just oriented a signed-in
 // customer toward "My Bookings" — this is the real public homepage now,
@@ -11,6 +12,7 @@ import Navbar from "../../components/Navbar";
 // logic — it just navigates to the ALREADY-WORKING /organizations page
 // with the term pre-filled, reusing that page's real search entirely.
 function HomePage() {
+  useDocumentTitle("Find a Business Near You");
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [popularOrgs, setPopularOrgs] = useState([]);

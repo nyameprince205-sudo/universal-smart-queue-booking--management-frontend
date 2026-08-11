@@ -4,6 +4,7 @@ import { Phone, MessageCircle, Globe, Link2, AtSign, Clock, MapPin } from "lucid
 import { useAuth } from "../../context/AuthContext";
 import { getPublicOrganization } from "../../api/publicOrg";
 import { createMyBooking, createGuestBooking } from "../../api/myBookings";
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 
 // Shared by both the logged-in and guest booking paths — same branch/
 // service/date/time/party-size/notes fields either way. `onSubmit` is
@@ -335,6 +336,7 @@ function OrgBookingPage() {
   const [org, setOrg] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  useDocumentTitle(org ? `Book ${org.name}` : "Book a Service");
 
   useEffect(() => {
     setLoading(true);

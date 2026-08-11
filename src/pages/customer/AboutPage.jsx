@@ -1,19 +1,20 @@
 import Navbar from "../../components/Navbar";
-
+import useDocumentTitle from "../../hooks/useDocumentTitle";
 // Phase 17, Step 2. Pure static content, zero backend — built as the real
 // final version now rather than deferred to Step 4, since there's nothing
 // to gate it on.
 function AboutPage() {
+  useDocumentTitle("About Us");
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold text-slate-800">About Universal Smart Queue Booking Management</h1>
+        <h1 className="text-3xl font-bold text-slate-800">About QueueSaaS</h1>
 
         <section className="mt-8">
           <h2 className="text-xl font-semibold text-slate-800">Platform Overview</h2>
           <p className="mt-2 text-slate-600 leading-relaxed">
-            Universal-Smart Queue Booking Management is a multi-tenant queue and booking management platform built for restaurants, salons,
+            QueueSaaS is a multi-tenant queue and booking management platform built for restaurants, salons,
             hospitals, banks, and service businesses across Ghana and Africa. Any business can join the
             platform to manage bookings and live queues, while their customers get a fast, account-optional
             way to book a service or check their place in line.
