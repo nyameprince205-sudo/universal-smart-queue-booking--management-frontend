@@ -19,6 +19,10 @@ import TrackTicketPage from "../pages/customer/TrackTicketPage";
 import OrganizationSearchPage from "../pages/customer/OrganizationSearchPage";
 import RequestRegistrationPage from "../pages/customer/RequestRegistrationPage";
 import OrganizationRequestsPage from "../pages/admin/OrganizationRequestsPage";
+import AboutPage from "../pages/customer/AboutPage";
+import ContactPage from "../pages/customer/ContactPage";
+
+
 // Phase 18, Module 13: everything below is lazy — every one of these pages
 // lives behind a staff/admin login (ProtectedRoute), so a guest customer
 // browsing /book/:slug or a fresh visitor hitting the homepage was ALWAYS
@@ -103,6 +107,9 @@ function AppRoutes() {
       <Route path="/track/:uuid" element={<TrackTicketPage />} />
       <Route path="/organizations" element={<OrganizationSearchPage />} />
       <Route path="/request-registration" element={<RequestRegistrationPage />} />
+
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
 
       <Route
         path="/my-bookings"
