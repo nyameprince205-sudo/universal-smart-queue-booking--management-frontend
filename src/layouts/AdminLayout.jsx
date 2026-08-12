@@ -3,7 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import {
   LayoutDashboard, Calendar, Ticket, Building2, Wrench, UserCog, BarChart3,
   Gauge, FileText, CreditCard, Settings, LifeBuoy, ChevronsLeft, ChevronsRight,
-  Menu, X,
+  Menu, X, Users,
 } from "lucide-react";
 import ProfileDropdown from "../components/ProfileDropdown";
 import NotificationBell from "../components/NotificationBell";
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { to: "/admin/branches", label: "Branches", icon: Building2 },
   { to: "/admin/services", label: "Services", icon: Wrench },
   { to: "/admin/staff", label: "Staff", icon: UserCog },
+  { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/admin/executive", label: "Executive", icon: Gauge },
   { to: "/admin/reports", label: "Reports", icon: FileText },

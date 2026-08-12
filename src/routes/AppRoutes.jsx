@@ -22,6 +22,8 @@ import OrganizationRequestsPage from "../pages/admin/OrganizationRequestsPage";
 import AboutPage from "../pages/customer/AboutPage";
 import ContactPage from "../pages/customer/ContactPage";
 import ContactSubmissionsPage from "../pages/admin/ContactSubmissionsPage";
+import CustomersPage from "../pages/admin/CustomersPage";
+
 // Phase 18, Module 13: everything below is lazy — every one of these pages
 // lives behind a staff/admin login (ProtectedRoute), so a guest customer
 // browsing /book/:slug or a fresh visitor hitting the homepage was ALWAYS
@@ -149,6 +151,7 @@ function AppRoutes() {
         <Route path="bookings" element={<Lazy Component={BookingsPage} />} />
         <Route path="reports" element={<Lazy Component={ReportsPage} />} />
         <Route path="settings" element={<Lazy Component={SettingsPage} />} />
+        <Route path="customers" element={<CustomersPage />} />
       </Route>
 
 <Route
