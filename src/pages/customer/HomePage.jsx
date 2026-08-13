@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { searchOrganizations } from "../../api/publicOrg";
@@ -6,6 +6,7 @@ import { listMyBookings } from "../../api/myBookings";
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/Navbar";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
+import useCustomerBookingUpdates from "../../hooks/useCustomerBookingUpdates";
 import { formatBookingTime } from "../../utils/formatBookingTime";
 
 const STATUS_STYLES = {
@@ -27,11 +28,20 @@ const STATUS_STYLES = {
 function RecentBookings({ profile }) {
   const [bookings, setBookings] = useState(null);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     listMyBookings()
       .then((data) => setBookings(data.slice(0, 5))) // newest 5 — listMyBookings already sorts newest-first
       .catch(() => setBookings([]));
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // Same live-update hook MyBookingsPage uses — a booking's status
+  // changing while someone's sitting on the homepage now updates here
+  // too, not just on the dedicated bookings page.
+  useCustomerBookingUpdates(load);
 
   return (
     <div className="max-w-4xl mx-auto px-4 pt-10">

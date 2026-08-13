@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { listMyBookings, cancelMyBooking } from "../../api/myBookings";
 import LogoutButton from "../../components/LogoutButton";
 import { formatBookingTime } from "../../utils/formatBookingTime";
+import useCustomerBookingUpdates from "../../hooks/useCustomerBookingUpdates";
 
 const STATUS_STYLES = {
   pending: "bg-amber-100 text-amber-700",
@@ -42,6 +43,12 @@ function MyBookingsPage() {
   useEffect(() => {
     loadBookings();
   }, [loadBookings]);
+
+  // Live updates: refetch the whole list wholesale whenever staff moves
+  // any of this customer's bookings forward — check-in, completion —
+  // same "just refetch, don't try to merge a delta" simplicity the queue
+  // board's own real-time updates already use.
+  useCustomerBookingUpdates(loadBookings);
 
   async function handleCancel(booking) {
     if (!window.confirm(`Cancel your booking on ${new Date(booking.bookingDate).toLocaleDateString()}?`)) return;

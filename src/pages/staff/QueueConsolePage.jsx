@@ -3,6 +3,8 @@ import { useAuth } from "../../context/AuthContext";
 import LogoutButton from "../../components/LogoutButton";
 import { getBoard, listCounters, checkIn, callNext, markServing, completeTicket } from "../../api/queue";
 import { lookupCustomerByPhone, quickRegisterCustomer } from "../../api/customers";
+import { listBookings } from "../../api/adminBookings";
+import { formatBookingTime } from "../../utils/formatBookingTime";
 import { listBranches } from "../../api/branches";
 import { listServices } from "../../api/services";
 import { createQueueSocket } from "../../api/socket";
@@ -41,6 +43,90 @@ function TicketCard({ ticket, onStartServing, onComplete }) {
   );
 }
 
+// NEW — answers a real gap: a customer who ALREADY booked (their phone was
+// captured at booking time) had no way to be checked in without staff
+// asking for their phone number all over again via CheckInPanel's lookup
+// below — even though it's already sitting right there on their booking
+// record. This shows today's bookings still awaiting arrival, with
+// name/phone/service already visible, and checks them in with one click
+// using the SAME checkIn() call CheckInPanel uses — just with the
+// customer/service/bookingId already known instead of looked up.
+const AWAITING_STATUSES = ["pending", "confirmed"];
+
+function TodaysBookingsPanel({ branchId, onCheckedIn }) {
+  const [bookings, setBookings] = useState(null);
+  const [error, setError] = useState(null);
+  const [checkingInId, setCheckingInId] = useState(null);
+
+  const load = useCallback(async () => {
+    setError(null);
+    try {
+      const todayIso = new Date().toISOString().slice(0, 10);
+      const data = await listBookings(todayIso, branchId);
+      setBookings(data.filter((b) => AWAITING_STATUSES.includes(b.status)));
+    } catch (err) {
+      setError(err.response?.data?.error || "Couldn't load today's bookings.");
+    }
+  }, [branchId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function handleCheckIn(booking) {
+    setCheckingInId(booking.id);
+    setError(null);
+    try {
+      await checkIn({
+        customerId: booking.customerId,
+        serviceId: booking.serviceId,
+        branchId,
+        bookingId: booking.id,
+      });
+      setBookings((prev) => prev.filter((b) => b.id !== booking.id));
+      onCheckedIn();
+    } catch (err) {
+      setError(err.response?.data?.error || "Couldn't check this booking in.");
+    } finally {
+      setCheckingInId(null);
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 p-5">
+      <p className="text-sm font-medium text-slate-500 mb-3">Today's Bookings</p>
+
+      {error && (
+        <div className="mb-3 rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">{error}</div>
+      )}
+      {bookings === null && <p className="text-sm text-slate-400">Loading…</p>}
+      {bookings?.length === 0 && <p className="text-sm text-slate-400">No bookings awaiting arrival today.</p>}
+
+      {bookings && bookings.length > 0 && (
+        <div className="space-y-2">
+          {bookings.map((b) => (
+            <div key={b.id} className="flex items-center justify-between border border-slate-100 rounded-md px-3 py-2">
+              <div>
+                <p className="text-sm font-medium text-slate-800">{b.customer?.name}</p>
+                <p className="text-xs text-slate-500">
+                  {b.customer?.phone} · {b.service?.name} · {formatBookingTime(b.bookingTime)}
+                </p>
+              </div>
+              <button
+                onClick={() => handleCheckIn(b)}
+                disabled={checkingInId === b.id}
+                className="rounded-md bg-sky-600 text-white text-xs font-medium px-3 py-1.5 hover:bg-sky-500 disabled:opacity-50 transition-colors shrink-0 ml-2"
+              >
+                {checkingInId === b.id ? "Checking in…" : "Check In"}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Separate component so its own form state (phone/name/etc) doesn't need
 // to live in the parent and doesn't get wiped by every board update.
 function CheckInPanel({ branchId, services, onCheckedIn }) {
@@ -51,19 +137,36 @@ function CheckInPanel({ branchId, services, onCheckedIn }) {
   const [serviceId, setServiceId] = useState("");
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  // Real bug fix: this panel used to check a customer in WITHOUT ever
+  // telling the backend which booking (if any) it belonged to — so even
+  // a customer who'd already booked, and got found here by phone, would
+  // have their booking's status silently never update past whatever it
+  // was before. TodaysBookingsPanel above never had this problem (it
+  // always knows the bookingId already); this repairs the same gap here,
+  // by searching today's bookings for a match once a customer is found.
+  const [matchedBooking, setMatchedBooking] = useState(null);
 
   async function handleLookup(e) {
     e.preventDefault();
     setError(null);
     setFoundCustomer(null);
     setNotFound(false);
+    setMatchedBooking(null);
     try {
       const customer = await lookupCustomerByPhone(phone);
       setFoundCustomer(customer);
+
+      const todayIso = new Date().toISOString().slice(0, 10);
+      const todaysBookings = await listBookings(todayIso, branchId).catch(() => []);
+      const match = todaysBookings.find(
+        (b) => b.customerId === customer.id && ["pending", "confirmed"].includes(b.status)
+      );
+      if (match) {
+        setMatchedBooking(match);
+        setServiceId(match.serviceId);
+      }
     } catch (err) {
       if (err.response?.status === 404) {
-        // Not an error state — this is the normal "new walk-in" path, so
-        // show the quick-register name field instead of a red error banner.
         setNotFound(true);
       } else {
         setError(err.response?.data?.error || "Couldn't look up that number.");
@@ -80,14 +183,18 @@ function CheckInPanel({ branchId, services, onCheckedIn }) {
       if (!customer) {
         customer = await quickRegisterCustomer({ name, phone });
       }
-      await checkIn({ customerId: customer.id, serviceId, branchId });
-      // Reset the whole form for the next walk-in rather than leaving stale
-      // values a busy front-desk worker might not notice and re-submit.
+      await checkIn({
+        customerId: customer.id,
+        serviceId,
+        branchId,
+        bookingId: matchedBooking ? matchedBooking.id : undefined,
+      });
       setPhone("");
       setFoundCustomer(null);
       setNotFound(false);
       setName("");
       setServiceId("");
+      setMatchedBooking(null);
       onCheckedIn();
     } catch (err) {
       setError(err.response?.data?.error || "Couldn't check this customer in.");
@@ -117,6 +224,7 @@ function CheckInPanel({ branchId, services, onCheckedIn }) {
               setPhone(e.target.value);
               setFoundCustomer(null);
               setNotFound(false);
+              setMatchedBooking(null);
             }}
             className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
           />
@@ -128,6 +236,11 @@ function CheckInPanel({ branchId, services, onCheckedIn }) {
         </div>
 
         {foundCustomer && <p className="text-sm text-green-700">Found: {foundCustomer.name}</p>}
+        {matchedBooking && (
+          <p className="text-xs text-sky-700 bg-sky-50 border border-sky-200 rounded-md px-2 py-1.5">
+            Linked to their existing booking ({matchedBooking.service?.name}, {formatBookingTime(matchedBooking.bookingTime)})
+          </p>
+        )}
 
         {notFound && (
           <div>
@@ -175,10 +288,6 @@ function CheckInPanel({ branchId, services, onCheckedIn }) {
 function QueueConsolePage() {
   const { profile } = useAuth();
 
-  // A STAFF account is branch-scoped already (profile.branchId is set at
-  // login) — no picker needed. An ORG_ADMIN's token isn't branch-scoped
-  // (see queue.controller.js's callNext comment), so they have to choose
-  // WHICH branch's board they're looking at.
   const [branches, setBranches] = useState([]);
   const [branchId, setBranchId] = useState(profile?.branchId || null);
 
@@ -194,7 +303,6 @@ function QueueConsolePage() {
 
   useEffect(() => {
     if (profile?.branchId || branches.length) return;
-    // Only an ORG_ADMIN (no fixed branchId) ever needs this list.
     listBranches().then(setBranches).catch(() => {});
   }, [profile, branches.length]);
 
@@ -217,8 +325,6 @@ function QueueConsolePage() {
     }
   }, []);
 
-  // Fetch initial state AND connect the live socket whenever the active
-  // branch changes (including the very first time it's known).
   useEffect(() => {
     if (!branchId) return;
 
@@ -241,9 +347,6 @@ function QueueConsolePage() {
     setActionError(null);
     try {
       await callNext(selectedCounterId);
-      // No manual board refresh needed here — the backend broadcasts
-      // "queue:update" after every mutation, and the socket listener above
-      // already updates `board` when that arrives.
     } catch (err) {
       setActionError(err.response?.data?.error || "Couldn't call the next customer.");
     }
@@ -267,8 +370,6 @@ function QueueConsolePage() {
     }
   }
 
-  // ORG_ADMIN hasn't picked a branch yet — nothing else on this page makes
-  // sense until they do.
   if (!branchId) {
     return (
       <div className="min-h-screen bg-slate-50 p-8">
@@ -315,7 +416,6 @@ function QueueConsolePage() {
 
       <div className="mt-6 grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
-          {/* Call Next */}
           <div className="bg-white rounded-lg border border-slate-200 p-5">
             <p className="text-sm font-medium text-slate-500 mb-3">Call Next Customer</p>
             {actionError && <p className="mb-2 text-sm text-red-600">{actionError}</p>}
@@ -345,10 +445,11 @@ function QueueConsolePage() {
             </button>
           </div>
 
+          <TodaysBookingsPanel branchId={branchId} onCheckedIn={() => {}} />
+
           <CheckInPanel branchId={branchId} services={services} onCheckedIn={() => {}} />
         </div>
 
-        {/* Live board */}
         <div className="lg:col-span-2">
           {loading ? (
             <p className="text-slate-400">Loading…</p>
