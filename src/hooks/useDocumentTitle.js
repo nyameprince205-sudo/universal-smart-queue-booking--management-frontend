@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const BASE_TITLE = "QueueSaaS";
+const BASE_TITLE = "Universal Smart Queue & Booking Management System";
 
 function useDocumentTitle(title) {
   useEffect(() => {

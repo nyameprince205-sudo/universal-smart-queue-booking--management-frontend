@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import LogoutButton from "../../components/LogoutButton";
 import { getBoard, listCounters, checkIn, callNext, markServing, completeTicket } from "../../api/queue";
@@ -156,11 +157,19 @@ function CheckInPanel({ branchId, services, onCheckedIn }) {
       const customer = await lookupCustomerByPhone(phone);
       setFoundCustomer(customer);
 
-      const todayIso = new Date().toISOString().slice(0, 10);
-      const todaysBookings = await listBookings(todayIso, branchId).catch(() => []);
-      const match = todaysBookings.find(
-        (b) => b.customerId === customer.id && ["pending", "confirmed"].includes(b.status)
-      );
+      // Deliberately NOT date-filtered — a customer's booking could be for
+      // today, a future date they're arriving early for, or a date that
+      // was simply entered wrong when it was made. Searching only "today"
+      // meant a booking dated even one day off from today could never be
+      // found or linked here, no matter what actually happened with the
+      // customer. If more than one match exists, the soonest one wins —
+      // simple, predictable, and right in the overwhelmingly common case
+      // of a customer having at most one outstanding booking at a time.
+      const allBookings = await listBookings(undefined, branchId).catch(() => []);
+      const matches = allBookings
+        .filter((b) => b.customerId === customer.id && ["pending", "confirmed"].includes(b.status))
+        .sort((a, b) => new Date(a.bookingDate) - new Date(b.bookingDate));
+      const match = matches[0] || null;
       if (match) {
         setMatchedBooking(match);
         setServiceId(match.serviceId);
@@ -238,7 +247,7 @@ function CheckInPanel({ branchId, services, onCheckedIn }) {
         {foundCustomer && <p className="text-sm text-green-700">Found: {foundCustomer.name}</p>}
         {matchedBooking && (
           <p className="text-xs text-sky-700 bg-sky-50 border border-sky-200 rounded-md px-2 py-1.5">
-            Linked to their existing booking ({matchedBooking.service?.name}, {formatBookingTime(matchedBooking.bookingTime)})
+            Linked to their existing booking ({matchedBooking.service?.name}, {new Date(matchedBooking.bookingDate).toLocaleDateString()} at {formatBookingTime(matchedBooking.bookingTime)})
           </p>
         )}
 
@@ -407,7 +416,12 @@ function QueueConsolePage() {
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-slate-800">Staff Queue Console</h1>
-        <LogoutButton />
+        <div className="flex items-center gap-4">
+          <Link to="/staff/customers" className="text-sm text-sky-600 hover:underline">
+            Customers
+          </Link>
+          <LogoutButton />
+        </div>
       </div>
 
       {error && (

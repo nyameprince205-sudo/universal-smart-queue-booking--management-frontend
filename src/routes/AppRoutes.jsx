@@ -23,6 +23,7 @@ import AboutPage from "../pages/customer/AboutPage";
 import ContactPage from "../pages/customer/ContactPage";
 import ContactSubmissionsPage from "../pages/admin/ContactSubmissionsPage";
 import CustomersPage from "../pages/admin/CustomersPage";
+import StaffCustomersPage from "../pages/staff/StaffCustomersPage";
 
 // Phase 18, Module 13: everything below is lazy — every one of these pages
 // lives behind a staff/admin login (ProtectedRoute), so a guest customer
@@ -179,9 +180,17 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
+      <Route
+  path="/staff/customers"
+  element={
+    <ProtectedRoute authType="staff" allowedRoles={["STAFF", "ORG_ADMIN"]}>
+      <StaffCustomersPage />
+    </ProtectedRoute>
+  }
+/>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
+
   );
 }
 
