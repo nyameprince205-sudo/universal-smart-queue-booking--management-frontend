@@ -4,6 +4,7 @@ import Modal from "../../components/Modal";
 import { listOrganizations, createOrganization, updateOrganizationStatus, listBusinessTypes } from "../../api/platform";
 import { listOrganizationRequests, reviewOrganizationRequest } from "../../api/organizationRequests";
 import { listContactSubmissions, markContactSubmissionRead } from "../../api/contact";
+import { listOrgAdmins, deactivateOrgAdmin, reactivateOrgAdmin } from "../../api/platformUsers";
 
 // This page used to only show the organization list — registration
 // requests and contact messages each lived on their own separate page,
@@ -300,6 +301,72 @@ function MessagesTab({ submissions, loading, unreadOnly, setUnreadOnly, onMarkRe
   );
 }
 
+// Super Admin's own missing toolkit, filled in — every Org Admin across
+// the whole platform, not just one organization's own. Deactivating one
+// here immediately locks that person out (same login check every other
+// deactivation in this app already relies on), without touching the
+// organization itself or its staff.
+const ADMIN_STATUS_STYLES = {
+  active: "bg-emerald-100 text-emerald-700",
+  inactive: "bg-slate-200 text-slate-500",
+};
+
+function OrgAdminsTab({ orgAdmins, loading, onToggleStatus, actioningId }) {
+  return (
+    <div>
+      <p className="text-sm text-warm-muted">{orgAdmins.length} Org Admin{orgAdmins.length === 1 ? "" : "s"} across the platform</p>
+
+      {loading && <p className="mt-8 text-warm-muted">Loading…</p>}
+      {!loading && orgAdmins.length === 0 && <p className="mt-8 text-warm-muted">No Org Admins yet.</p>}
+
+      {!loading && orgAdmins.length > 0 && (
+        <div className="mt-4 bg-white rounded-lg border border-warm-border overflow-hidden">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-warm-bg text-warm-muted">
+              <tr>
+                <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 font-medium">Organization</th>
+                <th className="px-4 py-3 font-medium">Contact</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-warm-border">
+              {orgAdmins.map((a) => {
+                const isActive = a.status === "active";
+                return (
+                  <tr key={a.id} className={isActive ? "" : "bg-warm-bg"}>
+                    <td className="px-4 py-3 font-medium text-warm-ink">{a.name}</td>
+                    <td className="px-4 py-3 text-warm-muted-2">{a.organizationName || "—"}</td>
+                    <td className="px-4 py-3 text-warm-muted-2">
+                      <p>{a.email}</p>
+                      {a.phone && <p className="text-xs text-warm-muted">{a.phone}</p>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${ADMIN_STATUS_STYLES[a.status] || "bg-slate-100 text-warm-muted-2"}`}>
+                        {isActive ? "Active" : "Deactivated"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => onToggleStatus(a)}
+                        disabled={actioningId === a.id}
+                        className={`text-sm font-medium hover:underline disabled:opacity-50 ${isActive ? "text-red-600" : "text-forest-600"}`}
+                      >
+                        {actioningId === a.id ? "Working…" : isActive ? "Deactivate" : "Reactivate"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PlatformPage() {
   const [activeTab, setActiveTab] = useState("organizations");
 
@@ -321,6 +388,11 @@ function PlatformPage() {
   const [submissionsLoading, setSubmissionsLoading] = useState(true);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [markingId, setMarkingId] = useState(null);
+
+  // Org Admins
+  const [orgAdmins, setOrgAdmins] = useState([]);
+  const [orgAdminsLoading, setOrgAdminsLoading] = useState(true);
+  const [orgAdminActioningId, setOrgAdminActioningId] = useState(null);
 
   const [error, setError] = useState(null);
 
@@ -364,6 +436,20 @@ function PlatformPage() {
   useEffect(() => { loadOrganizations(); }, [loadOrganizations]);
   useEffect(() => { loadRequests(); }, [loadRequests]);
   useEffect(() => { loadSubmissions(); }, [loadSubmissions]);
+
+  const loadOrgAdmins = useCallback(async () => {
+    setOrgAdminsLoading(true);
+    try {
+      const data = await listOrgAdmins();
+      setOrgAdmins(data);
+    } catch (err) {
+      setError(err.response?.data?.error || "Couldn't load Org Admins.");
+    } finally {
+      setOrgAdminsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadOrgAdmins(); }, [loadOrgAdmins]);
 
   // Badge counts — fetched independently of whatever filter each tab
   // currently has applied (so the "Requests" badge still shows the
@@ -434,10 +520,29 @@ function PlatformPage() {
     }
   }
 
+  async function handleToggleOrgAdminStatus(admin) {
+    const isActive = admin.status === "active";
+    if (isActive && !window.confirm(`Deactivate ${admin.name}? They won't be able to log in until reactivated.`)) {
+      return;
+    }
+    setOrgAdminActioningId(admin.id);
+    setError(null);
+    try {
+      if (isActive) await deactivateOrgAdmin(admin.id);
+      else await reactivateOrgAdmin(admin.id);
+      await loadOrgAdmins();
+    } catch (err) {
+      setError(err.response?.data?.error || "Couldn't update this Org Admin.");
+    } finally {
+      setOrgAdminActioningId(null);
+    }
+  }
+
   const TABS = [
     { key: "organizations", label: "Organizations", badge: null },
     { key: "requests", label: "Registration Requests", badge: pendingCount },
     { key: "messages", label: "Messages", badge: unreadCount },
+    { key: "orgAdmins", label: "Org Admins", badge: null },
   ];
 
   return (
@@ -507,6 +612,14 @@ function PlatformPage() {
             setUnreadOnly={setUnreadOnly}
             onMarkRead={handleMarkRead}
             markingId={markingId}
+          />
+        )}
+        {activeTab === "orgAdmins" && (
+          <OrgAdminsTab
+            orgAdmins={orgAdmins}
+            loading={orgAdminsLoading}
+            onToggleStatus={handleToggleOrgAdminStatus}
+            actioningId={orgAdminActioningId}
           />
         )}
       </div>
