@@ -48,7 +48,7 @@ function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-warm-bg flex">
       {/* Mobile top bar — only rendered below the md breakpoint. Desktop
           never sees this at all; the sidebar itself is always visible there. */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-slate-800 text-white flex items-center justify-between px-4 py-3">

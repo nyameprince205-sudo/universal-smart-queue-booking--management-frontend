@@ -381,7 +381,7 @@ function QueueConsolePage() {
 
   if (!branchId) {
     return (
-      <div className="min-h-screen bg-slate-50 p-8">
+      <div className="min-h-screen bg-warm-bg p-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold text-slate-800">Staff Queue Console</h1>
           <LogoutButton />
@@ -413,7 +413,7 @@ function QueueConsolePage() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
+    <div className="min-h-screen bg-warm-bg p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-slate-800">Staff Queue Console</h1>
         <div className="flex items-center gap-4">

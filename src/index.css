@@ -1,1 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Sora:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+
+/* Shared design tokens for the customer-facing side and Super Admin
+   Dashboard — grounded in the product itself rather than a generic SaaS
+   palette. A deep forest green (trust, "go", service-ready) paired with a
+   warm gold accent (value, warmth) on a warm off-white base, deliberately
+   avoiding both the generic blue/indigo SaaS default AND the overused
+   AI-design terracotta-on-cream look. Org Admin pages (AdminLayout and
+   everything nested under it) intentionally keep their existing slate
+   palette — only their page background changes to this same warm tone,
+   nothing else about their design.
+   
+   Fraunces (a warm, characterful serif) carries headings and the ticket
+   motif specifically, since those are the moments meant to feel distinct;
+   Sora (a confident humanist sans) carries everything else — body text,
+   UI chrome, buttons — since a working tool needs to stay legible first. */
+@theme {
+  --color-forest-50: #EAF3EE;
+  --color-forest-100: #C5DFD1;
+  --color-forest-400: #2D7A54;
+  --color-forest-600: #1B5E3F;
+  --color-forest-700: #14492F;
+  --color-forest-900: #0D2F1F;
+
+  --color-gold-50: #FDF4E3;
+  --color-gold-100: #F0DCAE;
+  --color-gold-400: #D9AB3F;
+  --color-gold-600: #C9962C;
+  --color-gold-800: #8C6D1F;
+
+  --color-warm-bg: #FAF7F0;
+  --color-warm-card: #FFFFFF;
+  --color-warm-border: #E5DFD1;
+  --color-warm-ink: #1F1B16;
+  --color-warm-muted: #8C8577;
+  --color-warm-muted-2: #6B6459;
+
+  --font-display: "Fraunces", serif;
+  --font-sans: "Sora", sans-serif;
+}

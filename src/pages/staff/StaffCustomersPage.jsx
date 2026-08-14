@@ -40,7 +40,7 @@ function StaffCustomersPage() {
   }, [customers, search]);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
+    <div className="min-h-screen bg-warm-bg p-8">
       <div className="flex items-center justify-between max-w-3xl mx-auto">
         <div>
           <h1 className="text-2xl font-semibold text-slate-800">Customers</h1>

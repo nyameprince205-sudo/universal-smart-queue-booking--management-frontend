@@ -10,8 +10,8 @@ async function listOrganizationRequests(status) {
   return data;
 }
 
-async function reviewOrganizationRequest(id, status, reviewNotes) {
-  const { data } = await apiClient.patch(`/organization-requests/${id}/review`, { status, reviewNotes });
+async function reviewOrganizationRequest(id, status, businessTypeId, reviewNotes) {
+  const { data } = await apiClient.patch(`/organization-requests/${id}/review`, { status, businessTypeId, reviewNotes });
   return data;
 }
 
