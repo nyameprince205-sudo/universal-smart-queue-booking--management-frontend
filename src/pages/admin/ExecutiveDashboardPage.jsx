@@ -4,22 +4,11 @@ import { Users, CheckCircle2, UserCog, Gauge, TrendingUp, TrendingDown } from "l
 import { getExecutiveSummary } from "../../api/analytics";
 import StatCard from "../../components/StatCard";
 import { formatDuration } from "../../utils/formatDuration";
-
 const REFRESH_INTERVAL_MS = 30000;
-
-// Phase 18, Module 10: one branch = one card, replacing the old
-// branch-ranking TABLE. "Clicking a branch opens its analytics dashboard"
-// per the spec — links to /admin/analytics rather than a branch-specific
-// filtered view, since AnalyticsPage doesn't support pre-selecting a
-// branch yet (a real, flagged limitation, not silently dropped).
-function BranchCard({ branch }) {
-  return (
-    <Link
-      to="/admin/analytics"
-      className={`block rounded-lg border p-4 hover:border-sky-300 transition-colors ${
-        branch.overloaded ? "bg-red-50 border-red-200" : "bg-white border-slate-200"
-      }`}
-    >
+function BranchCard({
+  branch
+}) {
+  return <Link to="/admin/analytics" className={`block rounded-lg border p-4 hover:border-sky-300 transition-colors ${branch.overloaded ? "bg-red-50 border-red-200" : "bg-white border-slate-200"}`}>
       <div className="flex items-center justify-between">
         <p className="font-medium text-slate-800">{branch.branchName}</p>
         <span className={`w-2 h-2 rounded-full ${branch.overloaded ? "bg-red-500" : "bg-green-500"}`} />
@@ -52,43 +41,37 @@ function BranchCard({ branch }) {
           </p>
         </div>
       </div>
-    </Link>
-  );
+    </Link>;
 }
-
-// Phase 18, Module 11. A small, generic "highlight card" — growth rate,
-// best branch, best staff, etc. all fit the same "label + headline value +
-// optional detail line" shape, so one component covers all of them
-// instead of a bespoke card per fact.
-function SummaryCard({ label, value, detail, icon: Icon }) {
-  return (
-    <div className="bg-white rounded-lg border border-slate-200 p-4">
+function SummaryCard({
+  label,
+  value,
+  detail,
+  icon: Icon
+}) {
+  return <div className="bg-white rounded-lg border border-slate-200 p-4">
       <div className="flex items-center gap-2 text-slate-400">
         {Icon && <Icon className="w-4 h-4" />}
         <p className="text-xs font-medium">{label}</p>
       </div>
       <p className="mt-1 text-lg font-semibold text-slate-800">{value}</p>
       {detail && <p className="text-xs text-slate-500">{detail}</p>}
-    </div>
-  );
+    </div>;
 }
-
-function GrowthValue({ percent }) {
+function GrowthValue({
+  percent
+}) {
   if (percent == null) return <span className="text-slate-400">—</span>;
   const Icon = percent >= 0 ? TrendingUp : TrendingDown;
   const color = percent >= 0 ? "text-green-600" : "text-red-600";
-  return (
-    <span className={`inline-flex items-center gap-1 ${color}`}>
+  return <span className={`inline-flex items-center gap-1 ${color}`}>
       <Icon className="w-4 h-4" /> {Math.abs(percent)}%
-    </span>
-  );
+    </span>;
 }
-
 function ExecutiveDashboardPage() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const load = useCallback(async () => {
     try {
       const data = await getExecutiveSummary();
@@ -100,33 +83,25 @@ function ExecutiveDashboardPage() {
       setLoading(false);
     }
   }, []);
-
   useEffect(() => {
     load();
     const interval = setInterval(load, REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [load]);
-
   if (loading) {
-    return (
-      <div className="p-8 max-w-5xl">
+    return <div className="p-8 max-w-5xl">
         <p className="text-slate-400">Loading…</p>
-      </div>
-    );
+      </div>;
   }
-
   if (error) {
-    return (
-      <div className="p-8 max-w-5xl">
+    return <div className="p-8 max-w-5xl">
         <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
-      </div>
-    );
+      </div>;
   }
-
-  const { summary: extras } = summary;
-
-  return (
-    <div className="p-8 max-w-5xl">
+  const {
+    summary: extras
+  } = summary;
+  return <div className="p-8 max-w-5xl">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-semibold text-slate-800">Executive Dashboard</h1>
         <p className="text-xs text-slate-400">
@@ -134,20 +109,16 @@ function ExecutiveDashboardPage() {
         </p>
       </div>
 
-      {summary.alerts.length > 0 && (
-        <div className="mt-6 rounded-md bg-red-50 border border-red-200 px-4 py-3">
+      {summary.alerts.length > 0 && <div className="mt-6 rounded-md bg-red-50 border border-red-200 px-4 py-3">
           <p className="text-sm font-medium text-red-800">
             {summary.alerts.length} branch{summary.alerts.length > 1 ? "es" : ""} need attention
           </p>
           <ul className="mt-1 space-y-1">
-            {summary.alerts.map((a) => (
-              <li key={a.branchId} className="text-sm text-red-700">
+            {summary.alerts.map(a => <li key={a.branchId} className="text-sm text-red-700">
                 <span className="font-medium">{a.branchName}:</span> {a.reason}
-              </li>
-            ))}
+              </li>)}
           </ul>
-        </div>
-      )}
+        </div>}
 
       <p className="mt-6 text-sm font-medium text-slate-500">Live Right Now</p>
       <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -165,7 +136,7 @@ function ExecutiveDashboardPage() {
         <StatCard label="Revenue" value={`GHS ${summary.today.revenue.toFixed(2)}`} />
       </div>
 
-      {/* Module 11: Executive Summary */}
+      
       <p className="mt-6 text-sm font-medium text-slate-500">Executive Summary</p>
       <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
         <SummaryCard label="Weekly Growth" value={<GrowthValue percent={extras.weeklyGrowthPercent} />} detail="bookings vs last week" icon={TrendingUp} />
@@ -176,24 +147,17 @@ function ExecutiveDashboardPage() {
         <SummaryCard label="Highest / Lowest Wait" value={extras.highestWaitBranch ? `${extras.highestWaitBranch.branchName}` : "—"} detail={extras.lowestWaitBranch ? `Lowest: ${extras.lowestWaitBranch.branchName}` : undefined} icon={Gauge} />
       </div>
 
-      {/* Module 10: Branch Performance Cards */}
-      {summary.branchRanking.length > 0 && (
-        <>
+      
+      {summary.branchRanking.length > 0 && <>
           <p className="mt-6 text-sm font-medium text-slate-500">Branch Performance</p>
           <div className="mt-2 grid sm:grid-cols-2 gap-4">
-            {summary.branchRanking.map((branch) => (
-              <BranchCard key={branch.branchId} branch={branch} />
-            ))}
+            {summary.branchRanking.map(branch => <BranchCard key={branch.branchId} branch={branch} />)}
           </div>
-        </>
-      )}
+        </>}
 
       <div className="mt-6 bg-white rounded-lg border border-slate-200 overflow-hidden">
         <p className="text-sm font-medium text-slate-500 px-5 pt-5 pb-3">Service Ranking (today)</p>
-        {summary.serviceRanking.length === 0 ? (
-          <p className="text-sm text-slate-400 px-5 pb-5">No completed bookings yet today.</p>
-        ) : (
-          <table className="w-full text-sm text-left">
+        {summary.serviceRanking.length === 0 ? <p className="text-sm text-slate-400 px-5 pb-5">No completed bookings yet today.</p> : <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
                 <th className="px-5 py-2 font-medium">Service</th>
@@ -201,18 +165,13 @@ function ExecutiveDashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {summary.serviceRanking.map((s) => (
-                <tr key={s.serviceId}>
+              {summary.serviceRanking.map(s => <tr key={s.serviceId}>
                   <td className="px-5 py-2 font-medium text-slate-800">{s.serviceName}</td>
                   <td className="px-5 py-2 text-slate-600">{s.count}</td>
-                </tr>
-              ))}
+                </tr>)}
             </tbody>
-          </table>
-        )}
+          </table>}
       </div>
-    </div>
-  );
+    </div>;
 }
-
 export default ExecutiveDashboardPage;

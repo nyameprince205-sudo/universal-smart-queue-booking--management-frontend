@@ -2,32 +2,29 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { submitOrganizationRequest } from "../../api/organizationRequests";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
-
-// Phase 17, Step 1. Public — no login exists for a business that isn't on
-// the platform yet, same reasoning as guest booking having no auth
-// requirement. This deliberately does NOT create an organization or a
-// login on submit — see the backend delivery notes for why: a Super Admin
-// reviews this, then provisions the org through the existing, already-
-// working Create Organization flow, rather than a second path that could
-// drift from it.
-//
-// Phase 17, Step 5 addition: every field below now has a real htmlFor/id
-// pair — see ContactPage's own comment on the same fix for why proximity
-// alone isn't enough for a screen reader.
 function RequestRegistrationPage() {
   useDocumentTitle("Request Organization Registration");
   const [form, setForm] = useState({
-    businessName: "", ownerName: "", businessType: "", phone: "", email: "",
-    address: "", city: "", region: "", numberOfBranches: "", additionalNotes: "",
+    businessName: "",
+    ownerName: "",
+    businessType: "",
+    phone: "",
+    email: "",
+    address: "",
+    city: "",
+    region: "",
+    numberOfBranches: "",
+    additionalNotes: ""
   });
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
   function update(field, value) {
-    setForm((f) => ({ ...f, [field]: value }));
+    setForm(f => ({
+      ...f,
+      [field]: value
+    }));
   }
-
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
@@ -41,10 +38,8 @@ function RequestRegistrationPage() {
       setSubmitting(false);
     }
   }
-
   if (submitted) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    return <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <div className="max-w-md text-center" role="status">
           <h1 className="text-2xl font-semibold text-slate-800">Request received</h1>
           <p className="mt-3 text-slate-600">
@@ -54,12 +49,9 @@ function RequestRegistrationPage() {
             Back home
           </Link>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4">
+  return <div className="min-h-screen bg-slate-50 py-10 px-4">
       <main className="max-w-lg mx-auto">
         <h1 className="text-2xl font-semibold text-slate-800">Request Organization Registration</h1>
         <p className="mt-1 text-sm text-slate-500">
@@ -71,47 +63,47 @@ function RequestRegistrationPage() {
 
           <div>
             <label htmlFor="req-business-name" className="block text-sm font-medium text-slate-700">Business name</label>
-            <input id="req-business-name" required value={form.businessName} onChange={(e) => update("businessName", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+            <input id="req-business-name" required value={form.businessName} onChange={e => update("businessName", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
           </div>
           <div>
             <label htmlFor="req-owner-name" className="block text-sm font-medium text-slate-700">Owner name</label>
-            <input id="req-owner-name" required value={form.ownerName} onChange={(e) => update("ownerName", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+            <input id="req-owner-name" required value={form.ownerName} onChange={e => update("ownerName", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
           </div>
           <div>
             <label htmlFor="req-business-type" className="block text-sm font-medium text-slate-700">Business type</label>
-            <input id="req-business-type" required placeholder="e.g. Restaurant, Salon, Clinic" value={form.businessType} onChange={(e) => update("businessType", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+            <input id="req-business-type" required placeholder="e.g. Restaurant, Salon, Clinic" value={form.businessType} onChange={e => update("businessType", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="req-phone" className="block text-sm font-medium text-slate-700">Phone number</label>
-              <input id="req-phone" required type="tel" value={form.phone} onChange={(e) => update("phone", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+              <input id="req-phone" required type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
             </div>
             <div>
               <label htmlFor="req-email" className="block text-sm font-medium text-slate-700">Email</label>
-              <input id="req-email" required type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+              <input id="req-email" required type="email" value={form.email} onChange={e => update("email", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
             </div>
           </div>
           <div>
             <label htmlFor="req-address" className="block text-sm font-medium text-slate-700">Address <span className="text-slate-400 font-normal">(optional)</span></label>
-            <input id="req-address" value={form.address} onChange={(e) => update("address", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+            <input id="req-address" value={form.address} onChange={e => update("address", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="req-city" className="block text-sm font-medium text-slate-700">City <span className="text-slate-400 font-normal">(optional)</span></label>
-              <input id="req-city" value={form.city} onChange={(e) => update("city", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+              <input id="req-city" value={form.city} onChange={e => update("city", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
             </div>
             <div>
               <label htmlFor="req-region" className="block text-sm font-medium text-slate-700">Region <span className="text-slate-400 font-normal">(optional)</span></label>
-              <input id="req-region" value={form.region} onChange={(e) => update("region", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+              <input id="req-region" value={form.region} onChange={e => update("region", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
             </div>
           </div>
           <div>
             <label htmlFor="req-branches" className="block text-sm font-medium text-slate-700">Number of branches <span className="text-slate-400 font-normal">(optional)</span></label>
-            <input id="req-branches" type="number" min="1" value={form.numberOfBranches} onChange={(e) => update("numberOfBranches", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+            <input id="req-branches" type="number" min="1" value={form.numberOfBranches} onChange={e => update("numberOfBranches", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
           </div>
           <div>
             <label htmlFor="req-notes" className="block text-sm font-medium text-slate-700">Additional notes <span className="text-slate-400 font-normal">(optional)</span></label>
-            <textarea id="req-notes" rows={3} value={form.additionalNotes} onChange={(e) => update("additionalNotes", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
+            <textarea id="req-notes" rows={3} value={form.additionalNotes} onChange={e => update("additionalNotes", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
           </div>
 
           <button type="submit" disabled={submitting} className="w-full rounded-md bg-sky-600 text-white py-2 text-sm font-medium hover:bg-sky-500 disabled:opacity-50 transition-colors">
@@ -119,8 +111,6 @@ function RequestRegistrationPage() {
           </button>
         </form>
       </main>
-    </div>
-  );
+    </div>;
 }
-
 export default RequestRegistrationPage;

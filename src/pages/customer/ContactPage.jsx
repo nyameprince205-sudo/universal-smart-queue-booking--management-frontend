@@ -3,27 +3,24 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import { submitContactForm } from "../../api/contact";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
-
-// Phase 17, Step 4 — the form itself, completing what Step 2 deliberately
-// left as "coming soon." Same public, no-login pattern as every other
-// public submission in this app (registration requests, guest bookings).
-//
-// Phase 17, Step 5 addition: every field below now has a real htmlFor/id
-// pair, not just a label sitting visually next to an input. Visually
-// identical either way — the difference only shows up to a screen reader,
-// which can't infer "this label describes that field" from proximity
-// alone; it needs the explicit association.
 function ContactPage() {
   useDocumentTitle("Contact Us");
-  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: ""
+  });
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
   function update(field, value) {
-    setForm((f) => ({ ...f, [field]: value }));
+    setForm(f => ({
+      ...f,
+      [field]: value
+    }));
   }
-
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
@@ -37,9 +34,7 @@ function ContactPage() {
       setSubmitting(false);
     }
   }
-
-  return (
-    <div className="min-h-screen bg-slate-50">
+  return <div className="min-h-screen bg-slate-50">
       <Navbar />
       <main className="max-w-2xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold text-slate-800">Contact Us</h1>
@@ -72,86 +67,43 @@ function ContactPage() {
         <div className="mt-8 bg-white rounded-lg border border-slate-200 p-6">
           <h2 className="font-medium text-slate-800 mb-4">Send us a message</h2>
 
-          {submitted ? (
-            <div className="rounded-md bg-green-50 border border-green-200 px-4 py-4 text-center" role="status">
+          {submitted ? <div className="rounded-md bg-green-50 border border-green-200 px-4 py-4 text-center" role="status">
               <p className="font-medium text-green-800">Message sent!</p>
               <p className="text-sm text-green-700 mt-1">We'll get back to you at {form.email} soon.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700" role="alert">{error}</div>
-              )}
+            </div> : <form onSubmit={handleSubmit} className="space-y-4">
+              {error && <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700" role="alert">{error}</div>}
               <div className="grid sm:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="contact-name" className="block text-sm font-medium text-slate-700">Name</label>
-                  <input
-                    id="contact-name"
-                    required
-                    value={form.name}
-                    onChange={(e) => update("name", e.target.value)}
-                    className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800"
-                  />
+                  <input id="contact-name" required value={form.name} onChange={e => update("name", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
                 </div>
                 <div>
                   <label htmlFor="contact-email" className="block text-sm font-medium text-slate-700">Email</label>
-                  <input
-                    id="contact-email"
-                    required
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => update("email", e.target.value)}
-                    className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800"
-                  />
+                  <input id="contact-email" required type="email" value={form.email} onChange={e => update("email", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
                 </div>
               </div>
               <div>
                 <label htmlFor="contact-phone" className="block text-sm font-medium text-slate-700">
                   Phone <span className="text-slate-400 font-normal">(optional)</span>
                 </label>
-                <input
-                  id="contact-phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={(e) => update("phone", e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800"
-                />
+                <input id="contact-phone" type="tel" value={form.phone} onChange={e => update("phone", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
               </div>
               <div>
                 <label htmlFor="contact-subject" className="block text-sm font-medium text-slate-700">
                   Subject <span className="text-slate-400 font-normal">(optional)</span>
                 </label>
-                <input
-                  id="contact-subject"
-                  value={form.subject}
-                  onChange={(e) => update("subject", e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800"
-                />
+                <input id="contact-subject" value={form.subject} onChange={e => update("subject", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
               </div>
               <div>
                 <label htmlFor="contact-message" className="block text-sm font-medium text-slate-700">Message</label>
-                <textarea
-                  id="contact-message"
-                  required
-                  rows={4}
-                  value={form.message}
-                  onChange={(e) => update("message", e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800"
-                />
+                <textarea id="contact-message" required rows={4} value={form.message} onChange={e => update("message", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
               </div>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full rounded-md bg-sky-600 text-white py-2 text-sm font-medium hover:bg-sky-500 disabled:opacity-50 transition-colors"
-              >
+              <button type="submit" disabled={submitting} className="w-full rounded-md bg-sky-600 text-white py-2 text-sm font-medium hover:bg-sky-500 disabled:opacity-50 transition-colors">
                 {submitting ? "Sending…" : "Send Message"}
               </button>
-            </form>
-          )}
+            </form>}
         </div>
       </main>
-    </div>
-  );
+    </div>;
 }
-
 export default ContactPage;
