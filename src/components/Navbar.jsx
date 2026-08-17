@@ -16,6 +16,9 @@ const NAV_LINKS = [{
 }, {
   to: "/contact",
   label: "Contact"
+}, {
+  to: "/support",
+  label: "Support"
 }];
 function Navbar() {
   const [open, setOpen] = useState(false);

@@ -24,6 +24,9 @@ import ContactPage from "../pages/customer/ContactPage";
 import ContactSubmissionsPage from "../pages/admin/ContactSubmissionsPage";
 import CustomersPage from "../pages/admin/CustomersPage";
 import StaffCustomersPage from "../pages/staff/StaffCustomersPage";
+import SupportPage from "../pages/customer/SupportPage";
+import SupportInboxPage from "../pages/admin/SupportInboxPage";
+import StaffSupportPage from "../pages/staff/StaffSupportPage";
 const DashboardPage = lazy(() => import("../pages/admin/DashboardPage"));
 const BranchesPage = lazy(() => import("../pages/admin/BranchesPage"));
 const ServicesPage = lazy(() => import("../pages/admin/ServicesPage"));
@@ -56,6 +59,9 @@ function AppRoutes() {
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       
+      <Route path="/support" element={<SupportPage />} />
+
+
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/customer/forgot-password" element={<CustomerForgotPasswordPage />} />
       
@@ -94,6 +100,7 @@ function AppRoutes() {
         <Route path="reports" element={<Lazy Component={ReportsPage} />} />
         <Route path="settings" element={<Lazy Component={SettingsPage} />} />
         <Route path="customers" element={<CustomersPage />} />
+        <Route path="support" element={<SupportInboxPage senderType="org_admin" canResolve={true} pageTitle="Support Inbox" showEscalate={true} />} />
       </Route>
 
 <Route path="/organization-requests" element={<ProtectedRoute authType="staff" allowedRoles={["SUPER_ADMIN"]}>
@@ -110,6 +117,12 @@ function AppRoutes() {
       <StaffCustomersPage />
     </ProtectedRoute>} />
       <Route path="*" element={<NotFoundPage />} />
+      <Route path="/staff/customers" element={<ProtectedRoute authType="staff" allowedRoles={["STAFF", "ORG_ADMIN"]}>
+  <StaffCustomersPage />
+</ProtectedRoute>} />
+    <Route path="/staff/support" element={<ProtectedRoute authType="staff" allowedRoles={["STAFF", "ORG_ADMIN"]}>
+  <StaffSupportPage />
+</ProtectedRoute>} />
     </Routes>;
 }
 export default AppRoutes;

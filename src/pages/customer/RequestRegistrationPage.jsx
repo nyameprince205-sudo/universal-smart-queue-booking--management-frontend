@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { submitOrganizationRequest } from "../../api/organizationRequests";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
+import Navbar from "../../components/Navbar";
 function RequestRegistrationPage() {
   useDocumentTitle("Request Organization Registration");
   const [form, setForm] = useState({
@@ -39,21 +40,29 @@ function RequestRegistrationPage() {
     }
   }
   if (submitted) {
-    return <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="max-w-md text-center" role="status">
-          <h1 className="text-2xl font-semibold text-slate-800">Request received</h1>
-          <p className="mt-3 text-slate-600">
-            Thanks — our team will review your request and reach out at {form.email} or {form.phone}.
-          </p>
-          <Link to="/" className="mt-6 inline-block text-sky-600 hover:underline">
-            Back home
-          </Link>
+    return <div className="min-h-screen bg-warm-bg font-sans">
+        <Navbar />
+        <div className="flex items-center justify-center px-4 py-16">
+          <div className="max-w-md text-center" role="status">
+            <h1 className="font-display text-2xl font-semibold text-warm-ink">Request received</h1>
+            <p className="mt-3 text-warm-muted-2">
+              Thanks — our team will review your request and reach out at {form.email} or {form.phone}.
+            </p>
+            <Link to="/" className="mt-6 inline-block text-forest-600 hover:underline">
+              Back home
+            </Link>
+          </div>
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-slate-50 py-10 px-4">
-      <main className="max-w-lg mx-auto">
-        <h1 className="text-2xl font-semibold text-slate-800">Request Organization Registration</h1>
+  return <div className="min-h-screen bg-warm-bg font-sans">
+      <Navbar />
+      <div className="py-10 px-4">
+        <main className="max-w-lg mx-auto">
+          <Link to="/" className="inline-flex items-center gap-1 text-sm text-forest-600 hover:underline mb-4">
+            ← Back to Home
+          </Link>
+          <h1 className="font-display text-2xl font-semibold text-warm-ink">Request Organization Registration</h1>
         <p className="mt-1 text-sm text-slate-500">
           Tell us about your business, and we'll reach out to get you set up.
         </p>
@@ -106,11 +115,12 @@ function RequestRegistrationPage() {
             <textarea id="req-notes" rows={3} value={form.additionalNotes} onChange={e => update("additionalNotes", e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800" />
           </div>
 
-          <button type="submit" disabled={submitting} className="w-full rounded-md bg-sky-600 text-white py-2 text-sm font-medium hover:bg-sky-500 disabled:opacity-50 transition-colors">
+          <button type="submit" disabled={submitting} className="w-full rounded-md bg-forest-600 text-white py-2 text-sm font-medium hover:bg-forest-700 disabled:opacity-50 transition-colors">
             {submitting ? "Submitting…" : "Submit Request"}
           </button>
         </form>
-      </main>
+        </main>
+      </div>
     </div>;
 }
 export default RequestRegistrationPage;

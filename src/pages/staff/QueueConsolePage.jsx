@@ -46,11 +46,10 @@ function TodaysBookingsPanel({
   const load = useCallback(async () => {
     setError(null);
     try {
-      const todayIso = new Date().toISOString().slice(0, 10);
-      const data = await listBookings(todayIso, branchId);
+      const data = await listBookings(undefined, branchId);
       setBookings(data.filter(b => AWAITING_STATUSES.includes(b.status)));
     } catch (err) {
-      setError(err.response?.data?.error || "Couldn't load today's bookings.");
+      setError(err.response?.data?.error || "Couldn't load bookings.");
     }
   }, [branchId]);
   useEffect(() => {
@@ -75,24 +74,46 @@ function TodaysBookingsPanel({
     }
   }
   return <div className="bg-white rounded-lg border border-slate-200 p-5">
-      <p className="text-sm font-medium text-slate-500 mb-3">Today's Bookings</p>
+      <p className="text-sm font-medium text-slate-500 mb-3">Bookings Awaiting Arrival</p>
 
       {error && <div className="mb-3 rounded-md bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">{error}</div>}
       {bookings === null && <p className="text-sm text-slate-400">Loading…</p>}
-      {bookings?.length === 0 && <p className="text-sm text-slate-400">No bookings awaiting arrival today.</p>}
+      {bookings?.length === 0 && <p className="text-sm text-slate-400">No bookings awaiting arrival.</p>}
 
       {bookings && bookings.length > 0 && <div className="space-y-2">
           {bookings.map(b => <div key={b.id} className="flex items-center justify-between border border-slate-100 rounded-md px-3 py-2">
               <div>
                 <p className="text-sm font-medium text-slate-800">{b.customer?.name}</p>
                 <p className="text-xs text-slate-500">
-                  {b.customer?.phone} · {b.service?.name} · {formatBookingTime(b.bookingTime)}
+                  {b.customer?.phone} · {b.service?.name}
+                </p>
+                <p className="text-xs text-slate-400">
+                  {new Date(b.bookingDate).toLocaleDateString()} at {formatBookingTime(b.bookingTime)}
                 </p>
               </div>
               <button onClick={() => handleCheckIn(b)} disabled={checkingInId === b.id} className="rounded-md bg-sky-600 text-white text-xs font-medium px-3 py-1.5 hover:bg-sky-500 disabled:opacity-50 transition-colors shrink-0 ml-2">
                 {checkingInId === b.id ? "Checking in…" : "Check In"}
               </button>
             </div>)}
+        </div>}
+    </div>;
+}
+function WalkInPanel({
+  branchId,
+  services,
+  onCheckedIn
+}) {
+  const [open, setOpen] = useState(false);
+  return <div className="bg-white rounded-lg border border-slate-200">
+      <button onClick={() => setOpen(o => !o)} className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
+        <span>Walk-in / Phone lookup</span>
+        <span className="text-slate-400">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && <div className="border-t border-slate-100 px-5 pb-5 pt-3">
+          <CheckInPanel branchId={branchId} services={services} onCheckedIn={() => {
+        onCheckedIn();
+        setOpen(false);
+      }} />
         </div>}
     </div>;
 }
@@ -119,7 +140,7 @@ function CheckInPanel({
       const customer = await lookupCustomerByPhone(phone);
       setFoundCustomer(customer);
       const allBookings = await listBookings(undefined, branchId).catch(() => []);
-      const matches = allBookings.filter(b => b.customerId === customer.id && ["pending", "confirmed"].includes(b.status)).sort((a, b) => new Date(a.bookingDate) - new Date(b.bookingDate));
+      const matches = allBookings.filter(b => String(b.customerId) === String(customer.id) && ["pending", "confirmed"].includes(b.status)).sort((a, b) => new Date(a.bookingDate) - new Date(b.bookingDate));
       const match = matches[0] || null;
       if (match) {
         setMatchedBooking(match);
@@ -307,6 +328,9 @@ function QueueConsolePage() {
           <Link to="/staff/customers" className="text-sm text-sky-600 hover:underline">
             Customers
           </Link>
+          <Link to="/staff/support" className="text-sm text-sky-600 hover:underline">
+            Support
+          </Link>
           <LogoutButton />
         </div>
       </div>
@@ -334,7 +358,7 @@ function QueueConsolePage() {
 
           <TodaysBookingsPanel branchId={branchId} onCheckedIn={() => {}} />
 
-          <CheckInPanel branchId={branchId} services={services} onCheckedIn={() => {}} />
+          <WalkInPanel branchId={branchId} services={services} onCheckedIn={() => {}} />
         </div>
 
         <div className="lg:col-span-2">

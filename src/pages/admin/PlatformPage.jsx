@@ -5,6 +5,7 @@ import { listOrganizations, createOrganization, updateOrganizationStatus, listBu
 import { listOrganizationRequests, reviewOrganizationRequest } from "../../api/organizationRequests";
 import { listContactSubmissions, markContactSubmissionRead } from "../../api/contact";
 import { listOrgAdmins, deactivateOrgAdmin, reactivateOrgAdmin } from "../../api/platformUsers";
+import SupportInboxPage from "./SupportInboxPage";
 const ORG_STATUS_STYLES = {
   trial: "bg-amber-100 text-amber-700",
   active: "bg-emerald-100 text-emerald-700",
@@ -465,6 +466,10 @@ function PlatformPage() {
     key: "orgAdmins",
     label: "Org Admins",
     badge: null
+  }, {
+    key: "support",
+    label: "Support",
+    badge: null
   }];
   return <div className="min-h-screen bg-warm-bg font-sans">
       <div className="bg-warm-ink">
@@ -495,6 +500,7 @@ function PlatformPage() {
         {activeTab === "requests" && <RequestsTab requests={requests} loading={requestsLoading} statusFilter={requestStatusFilter} setStatusFilter={setRequestStatusFilter} businessTypes={businessTypes} onReview={handleReviewRequest} reviewingId={reviewingId} />}
         {activeTab === "messages" && <MessagesTab submissions={submissions} loading={submissionsLoading} unreadOnly={unreadOnly} setUnreadOnly={setUnreadOnly} onMarkRead={handleMarkRead} markingId={markingId} />}
         {activeTab === "orgAdmins" && <OrgAdminsTab orgAdmins={orgAdmins} loading={orgAdminsLoading} onToggleStatus={handleToggleOrgAdminStatus} actioningId={orgAdminActioningId} />}
+        {activeTab === "support" && <SupportInboxPage senderType="super_admin" canResolve={true} pageTitle="Platform Support Inbox" showEscalate={false} />}
       </div>
     </div>;
 }

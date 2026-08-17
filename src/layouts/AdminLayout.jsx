@@ -47,6 +47,10 @@ const NAV_ITEMS = [{
   to: "/admin/subscription",
   label: "Subscription",
   icon: CreditCard
+}, {
+  to: "/admin/support",
+  label: "Support",
+  icon: LifeBuoy
 }];
 const COLLAPSE_STORAGE_KEY = "queueSaasSidebarCollapsed";
 function AdminLayout() {
@@ -101,10 +105,12 @@ function AdminLayout() {
               <span className={collapsed ? "truncate md:hidden" : "truncate"}>{item.label}</span>
             </NavLink>)}
 
-          <a href="mailto:support@queuesaas.example.com" onClick={closeMobile} title={collapsed ? "Support" : undefined} className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700/50 transition-colors">
-            <LifeBuoy className="w-4 h-4 shrink-0" />
-            <span className={collapsed ? "truncate md:hidden" : "truncate"}>Support</span>
-          </a>
+          <NavLink to="/admin/settings" onClick={closeMobile} title={collapsed ? "Settings" : undefined} className={({
+          isActive
+        }) => `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${isActive ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700/50"}`}>
+            <Settings className="w-4 h-4 shrink-0" />
+            <span className={collapsed ? "truncate md:hidden" : "truncate"}>Settings</span>
+          </NavLink>
         </nav>
 
         <div className="px-2 py-3 border-t border-slate-700">
