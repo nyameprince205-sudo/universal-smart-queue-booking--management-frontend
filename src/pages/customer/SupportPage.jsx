@@ -63,7 +63,7 @@ function SupportPage() {
       setSubmitting(false);
     }
   }
-  return <div className="min-h-screen bg-warm-bg font-sans">
+  return <div className="min-h-screen bg-warm-bg surface-texture-subtle font-sans">
       <Navbar />
       <div className="max-w-3xl mx-auto px-4 py-10">
         <Link to="/" className="inline-flex items-center gap-1 text-sm text-forest-600 hover:underline mb-4">← Back to Home</Link>

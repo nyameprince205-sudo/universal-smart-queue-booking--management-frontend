@@ -34,7 +34,7 @@ function ContactPage() {
       setSubmitting(false);
     }
   }
-  return <div className="min-h-screen bg-slate-50">
+  return <div className="min-h-screen bg-warm-bg surface-texture-subtle">
       <Navbar />
       <main className="max-w-2xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold text-slate-800">Contact Us</h1>

@@ -29,7 +29,7 @@ function OrganizationSearchPage() {
     e.preventDefault();
     runSearch(search);
   }
-  return <div className="min-h-screen bg-slate-50">
+  return <div className="min-h-screen bg-warm-bg surface-texture-subtle">
       <Navbar />
       <div className="py-10 px-4">
         <div className="max-w-md mx-auto">

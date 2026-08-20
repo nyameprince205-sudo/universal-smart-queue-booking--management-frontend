@@ -40,7 +40,7 @@ function RequestRegistrationPage() {
     }
   }
   if (submitted) {
-    return <div className="min-h-screen bg-warm-bg font-sans">
+    return <div className="min-h-screen bg-warm-bg surface-texture-subtle font-sans">
         <Navbar />
         <div className="flex items-center justify-center px-4 py-16">
           <div className="max-w-md text-center" role="status">

@@ -91,7 +91,7 @@ function TrackTicketPage() {
     label: data.status,
     color: "bg-slate-100 text-slate-500"
   };
-  return <div className="min-h-screen bg-slate-50 py-10 px-4">
+  return <div className="min-h-screen bg-warm-bg py-10 px-4">
       <div className="max-w-sm mx-auto">
         <p className="text-center text-sm text-slate-500">{data.organizationName}</p>
         <p className="text-center text-xs text-slate-400">{data.branchName}</p>

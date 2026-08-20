@@ -28,7 +28,7 @@ function StaffLoginPage() {
       setSubmitting(false);
     }
   }
-  return <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+  return <div className="min-h-screen flex items-center justify-center bg-warm-bg surface-texture-subtle px-4">
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-semibold text-slate-800 text-center">Staff &amp; Admin Login</h1>
         <p className="mt-1 text-sm text-slate-500 text-center">Sign in to manage your organization.</p>

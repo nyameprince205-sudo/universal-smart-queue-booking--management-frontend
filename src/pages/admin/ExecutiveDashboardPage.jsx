@@ -122,18 +122,18 @@ function ExecutiveDashboardPage() {
 
       <p className="mt-6 text-sm font-medium text-slate-500">Live Right Now</p>
       <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <StatCard label="Customers Waiting" value={summary.live.customersWaiting} />
-        <StatCard label="Being Served" value={summary.live.customersServing} />
+        <StatCard label="Customers Waiting" value={summary.live.customersWaiting} accent="gold" />
+        <StatCard label="Being Served" value={summary.live.customersServing} accent="forest" />
         <StatCard label="Active Staff" value={summary.live.activeStaffCount} />
         <StatCard label="Open Counters" value={summary.live.activeCounters} />
       </div>
 
       <p className="mt-6 text-sm font-medium text-slate-500">Today</p>
       <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <StatCard label="Completed" value={summary.today.customersCompleted} />
+        <StatCard label="Completed" value={summary.today.customersCompleted} accent="forest" />
         <StatCard label="Avg Wait" value={formatDuration(summary.today.averageWaitTimeSeconds)} />
         <StatCard label="Avg Service" value={formatDuration(summary.today.averageServiceTimeSeconds)} />
-        <StatCard label="Revenue" value={`GHS ${summary.today.revenue.toFixed(2)}`} />
+        <StatCard label="Revenue" value={`GHS ${summary.today.revenue.toFixed(2)}`} accent="gold" />
       </div>
 
       

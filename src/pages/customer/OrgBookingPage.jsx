@@ -231,7 +231,7 @@ function OrgBookingPage() {
       </div>;
   }
   const isLoggedInCustomer = isAuthenticated && authType === "customer";
-  return <div className="min-h-screen bg-slate-50 py-10 px-4">
+  return <div className="min-h-screen bg-warm-bg py-10 px-4">
       <div className="max-w-md mx-auto">
         
         <OrgProfile org={org} />

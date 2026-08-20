@@ -20,7 +20,7 @@ function VerifyEmailPage() {
       setErrorMessage(err.response?.data?.error || "This verification link is invalid or has expired.");
     });
   }, [token]);
-  return <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+  return <div className="min-h-screen flex items-center justify-center bg-warm-bg surface-texture-subtle px-4">
       <div className="w-full max-w-sm text-center">
         {status === "verifying" && <p className="text-slate-400">Verifying your email…</p>}
 

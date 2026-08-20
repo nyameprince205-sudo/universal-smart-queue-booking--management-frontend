@@ -46,7 +46,7 @@ function MyBookingsPage() {
       setCancelingId(null);
     }
   }
-  return <div className="min-h-screen bg-slate-50 p-8">
+  return <div className="min-h-screen bg-warm-bg p-8">
       <div className="flex items-center justify-between max-w-2xl mx-auto">
         <h1 className="text-2xl font-semibold text-slate-800">My Bookings</h1>
         <LogoutButton />

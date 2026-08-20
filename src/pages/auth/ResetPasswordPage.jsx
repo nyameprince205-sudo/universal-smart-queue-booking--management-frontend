@@ -38,7 +38,7 @@ function ResetPasswordPage() {
     }
   }
   if (!token) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    return <div className="min-h-screen flex items-center justify-center bg-warm-bg surface-texture-subtle px-4">
         <div className="w-full max-w-sm text-center">
           <h1 className="text-2xl font-semibold text-slate-800">Invalid link</h1>
           <p className="mt-2 text-sm text-slate-500">
@@ -48,7 +48,7 @@ function ResetPasswordPage() {
       </div>;
   }
   if (success) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    return <div className="min-h-screen flex items-center justify-center bg-warm-bg surface-texture-subtle px-4">
         <div className="w-full max-w-sm text-center">
           <h1 className="text-2xl font-semibold text-slate-800">Password reset</h1>
           <p className="mt-2 text-sm text-slate-500">
@@ -66,7 +66,7 @@ function ResetPasswordPage() {
         </div>
       </div>;
   }
-  return <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+  return <div className="min-h-screen flex items-center justify-center bg-warm-bg surface-texture-subtle px-4">
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-semibold text-slate-800 text-center">Reset Password</h1>
         <p className="mt-1 text-sm text-slate-500 text-center">Choose a new password below.</p>

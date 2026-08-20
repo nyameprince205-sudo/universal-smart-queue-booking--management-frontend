@@ -81,7 +81,7 @@ function HomePage() {
     e.preventDefault();
     navigate(searchTerm.trim() ? `/organizations?search=${encodeURIComponent(searchTerm.trim())}` : "/organizations");
   }
-  return <div className="min-h-screen bg-warm-bg font-sans">
+  return <div className="min-h-screen bg-warm-bg surface-texture font-sans">
       <Navbar />
 
       {isLoggedInCustomer && <RecentBookings profile={profile} />}

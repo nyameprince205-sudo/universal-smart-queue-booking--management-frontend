@@ -22,7 +22,7 @@ const NAV_LINKS = [{
 }];
 function Navbar() {
   const [open, setOpen] = useState(false);
-  return <nav className="bg-warm-card border-b border-warm-border sticky top-0 z-40 font-sans">
+  return <nav className="bg-warm-card border-b border-warm-border sticky top-0 z-40 font-sans chrome-shadow">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between py-3 md:py-4 gap-4">
           <Link to="/" className="font-display font-semibold text-warm-ink text-base md:text-lg leading-snug" onClick={() => setOpen(false)}>
