@@ -10,9 +10,13 @@ const STATUS_STYLES = {
   checked_in: "bg-indigo-100 text-indigo-700",
   completed: "bg-green-100 text-green-700",
   cancelled: "bg-slate-100 text-slate-500",
-  no_show: "bg-red-100 text-red-700"
+  no_show: "bg-red-100 text-red-700",
+  waitlisted: "bg-purple-100 text-purple-700"
 };
-const CANCELLABLE_STATUSES = ["pending", "confirmed"];
+const STATUS_LABELS = {
+  waitlisted: "On waitlist"
+};
+const CANCELLABLE_STATUSES = ["pending", "confirmed", "waitlisted"];
 function MyBookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -82,9 +86,16 @@ function MyBookingsPage() {
                     </p>
                   </div>
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${STATUS_STYLES[booking.status] || "bg-slate-100 text-slate-500"}`}>
-                    {booking.status.replace("_", " ")}
+                    {STATUS_LABELS[booking.status] || booking.status.replace("_", " ")}
                   </span>
                 </div>
+
+                
+                {booking.status === "waitlisted" && <p className="mt-2 text-xs text-purple-700 bg-purple-50 border border-purple-200 rounded-md px-2 py-1.5">
+                    This time was fully booked. If a place opens up, your booking is
+                    confirmed automatically and we'll message you — nothing to do in the
+                    meantime.
+                  </p>}
 
                 <div className="mt-3 flex items-center gap-4">
                   {ticket && <Link to={`/track/${ticket.uuid}`} className="text-sm text-sky-600 hover:underline">

@@ -45,14 +45,14 @@ function ContactPage() {
             <Mail className="w-5 h-5 text-sky-600 shrink-0 mt-0.5" aria-hidden="true" />
             <div>
               <p className="text-sm text-slate-400">Email</p>
-              <p className="font-medium text-slate-800">support@queuesaas.example.com</p>
+              <p className="font-medium text-slate-800">klonflexsolutions@gmail.com</p>
             </div>
           </div>
           <div className="bg-white rounded-lg border border-slate-200 p-5 flex items-start gap-3">
             <Phone className="w-5 h-5 text-sky-600 shrink-0 mt-0.5" aria-hidden="true" />
             <div>
               <p className="text-sm text-slate-400">Phone / WhatsApp</p>
-              <p className="font-medium text-slate-800">+233 20 000 0000</p>
+              <p className="font-medium text-slate-800">+233 533 116 300</p>
             </div>
           </div>
           <div className="bg-white rounded-lg border border-slate-200 p-5 flex items-start gap-3 sm:col-span-2">

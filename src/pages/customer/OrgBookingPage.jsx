@@ -52,6 +52,54 @@ function BookingForm({
     }
   }
   if (confirmedBooking) {
+    const isWaitlisted = confirmedBooking.status === "waitlisted";
+    const position = confirmedBooking.waitlistPosition;
+    if (isWaitlisted) {
+      return <div className="rounded-md border border-purple-200 bg-purple-50 px-4 py-4">
+          <p className="font-medium text-purple-900 text-center">This time is fully booked</p>
+
+          <p className="text-sm text-purple-800 mt-2 text-center">
+            {bookingDate} at {bookingTime}
+          </p>
+
+          <div className="mt-3 rounded-md bg-white border border-purple-200 px-3 py-3">
+            <p className="text-sm text-purple-900 font-medium">
+              You've been added to the waitlist
+              {position ? ` — you're number ${position} in line` : ""}
+            </p>
+            <p className="text-sm text-purple-800 mt-1.5 leading-relaxed">
+              All places at this time are taken. If someone ahead of you cancels, your
+              booking is confirmed automatically and we'll message you straight away on
+              the phone number and email you gave.
+            </p>
+            <p className="text-sm text-purple-800 mt-1.5 leading-relaxed">
+              You don't need to do anything to stay on the list.
+            </p>
+          </div>
+
+          <div className="mt-3 rounded-md bg-white border border-purple-200 px-3 py-3">
+            <p className="text-xs font-medium text-purple-900 uppercase tracking-wide">
+              Prefer not to wait?
+            </p>
+            <ul className="mt-1.5 text-sm text-purple-800 space-y-1">
+              <li>· Book a different time or date — most other slots are still open</li>
+              <li>· Try another branch if this business has more than one</li>
+              <li>· Cancel your place on the waitlist at any time</li>
+            </ul>
+          </div>
+
+          {isGuest ? <p className="mt-3 text-xs text-purple-800 text-center">
+              <Link to="/customer/register" className="underline">
+                Create a free account
+              </Link>{" "}
+              with the same phone number to track your place and cancel it yourself.
+            </p> : <div className="mt-3 flex gap-3 justify-center">
+              <Link to="/my-bookings" className="text-sm text-purple-900 underline">
+                View or cancel this booking
+              </Link>
+            </div>}
+        </div>;
+    }
     return <div className="rounded-md bg-green-50 border border-green-200 px-4 py-4 text-center">
         <p className="font-medium text-green-800">Booking confirmed!</p>
         <p className="text-sm text-green-700 mt-1">
