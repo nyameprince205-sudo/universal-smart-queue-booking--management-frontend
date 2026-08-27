@@ -11,7 +11,13 @@ async function createService(payload) {
   } = await apiClient.post("/services", payload);
   return data;
 }
+async function updateService(id, payload) {
+  const {
+    data
+  } = await apiClient.patch(`/services/${id}`, payload);
+  return data;
+}
 async function deactivateService(id) {
   await apiClient.delete(`/services/${id}`);
 }
-export { listServices, createService, deactivateService };
+export { listServices, createService, updateService, deactivateService };
