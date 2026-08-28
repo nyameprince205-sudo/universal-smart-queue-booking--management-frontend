@@ -72,6 +72,39 @@ function CreateOrgForm({
       </button>
     </form>;
 }
+function SubscriptionCell({
+  subscription
+}) {
+  if (!subscription) {
+    return <span className="text-xs text-warm-muted">No subscription</span>;
+  }
+  const {
+    state,
+    daysRemaining,
+    plan,
+    isTrial
+  } = subscription;
+  if (state === "expired") {
+    return <div>
+        <span className="rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700">
+          Expired
+        </span>
+        <p className="text-xs text-warm-muted mt-1">{isTrial ? "Trial ended" : plan}</p>
+      </div>;
+  }
+  if (state === "cancelled") {
+    return <span className="rounded-full px-2 py-0.5 text-xs font-medium bg-slate-100 text-slate-500">Cancelled</span>;
+  }
+  const urgent = daysRemaining <= 7;
+  return <div>
+      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${isTrial ? "bg-sky-100 text-sky-700" : "bg-green-100 text-green-700"}`}>
+        {isTrial ? "Trial" : plan}
+      </span>
+      <p className={`text-xs mt-1 ${urgent ? "text-amber-700 font-medium" : "text-warm-muted"}`}>
+        {daysRemaining === 0 ? "Ends today" : daysRemaining === 1 ? "1 day left" : `${daysRemaining} days left`}
+      </p>
+    </div>;
+}
 function OrganizationsTab({
   organizations,
   businessTypes,
@@ -100,6 +133,7 @@ function OrganizationsTab({
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Business Type</th>
                 <th className="px-4 py-3 font-medium">Email</th>
+                <th className="px-4 py-3 font-medium">Subscription</th>
                 <th className="px-4 py-3 font-medium">Status</th>
               </tr>
             </thead>
@@ -111,6 +145,7 @@ function OrganizationsTab({
                   </td>
                   <td className="px-4 py-3 text-warm-muted-2">{org.businessType?.name}</td>
                   <td className="px-4 py-3 text-warm-muted-2">{org.email}</td>
+                  <td className="px-4 py-3"><SubscriptionCell subscription={org.subscription} /></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${ORG_STATUS_STYLES[org.status]}`}>{org.status}</span>
