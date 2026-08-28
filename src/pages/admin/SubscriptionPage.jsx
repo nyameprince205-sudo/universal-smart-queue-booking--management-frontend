@@ -1,50 +1,28 @@
 import { useEffect, useState, useCallback } from "react";
-import { Package, Rocket, Crown, Check, AlertTriangle } from "lucide-react";
-import { listPlans, getMySubscription, initializeSubscription, verifyPayment, listPaymentHistory } from "../../api/subscriptions";
+import { listPlans, getMySubscription, initializeSubscription, verifyPayment } from "../../api/subscriptions";
 const PENDING_REF_KEY = "queueSaasPendingPaymentRef";
-const RENEWAL_REMINDER_DAYS = 7;
 const STATUS_STYLES = {
   active: "bg-green-100 text-green-700",
-  trial: "bg-sky-100 text-sky-700"
+  trial: "bg-sky-100 text-sky-700",
+  expired: "bg-red-100 text-red-700",
+  cancelled: "bg-slate-100 text-slate-500"
 };
-const PAYMENT_STATUS_STYLES = {
-  successful: "bg-green-100 text-green-700",
-  pending: "bg-amber-100 text-amber-700",
-  failed: "bg-red-100 text-red-700"
-};
-const PLAN_ICONS = [Package, Rocket, Crown];
-function daysUntil(dateString) {
-  return Math.ceil((new Date(dateString).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-}
-function formatLimit(value, label) {
-  return value != null ? `Up to ${value} ${label}` : `Unlimited ${label}`;
-}
-function formatFeature(feature) {
-  const humanizedKey = feature.key.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-  const value = feature.value.toLowerCase();
-  if (value === "false") return null;
-  if (value === "true") return humanizedKey;
-  return `${humanizedKey}: ${feature.value}`;
-}
 function SubscriptionPage() {
   const [subscription, setSubscription] = useState(null);
   const [plans, setPlans] = useState([]);
-  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pendingReference, setPendingReference] = useState(() => sessionStorage.getItem(PENDING_REF_KEY));
   const [verifying, setVerifying] = useState(false);
   const [verifyMessage, setVerifyMessage] = useState(null);
   const [startingCheckoutPlanId, setStartingCheckoutPlanId] = useState(null);
-  const [showCompare, setShowCompare] = useState(false);
   const loadAll = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [subData, plansData, paymentsData] = await Promise.all([getMySubscription(), listPlans(), listPaymentHistory()]);
+      const [subData, plansData] = await Promise.all([getMySubscription(), listPlans()]);
       setSubscription(subData.subscription === null ? null : subData);
       setPlans(plansData);
-      setPayments(paymentsData);
     } catch (err) {
       setError(err.response?.data?.error || "Couldn't load subscription info.");
     } finally {
@@ -92,9 +70,6 @@ function SubscriptionPage() {
     setPendingReference(null);
     setVerifyMessage(null);
   }
-  const recommendedPlanId = plans.length >= 3 ? plans[Math.floor(plans.length / 2)].id : null;
-  const renewalDaysLeft = subscription?.endDate ? daysUntil(subscription.endDate) : null;
-  const showRenewalReminder = renewalDaysLeft != null && renewalDaysLeft >= 0 && renewalDaysLeft <= RENEWAL_REMINDER_DAYS;
   return <div className="p-8 max-w-4xl">
       <h1 className="text-2xl font-semibold text-slate-800">Subscription</h1>
 
@@ -103,40 +78,63 @@ function SubscriptionPage() {
       {loading && <p className="mt-8 text-slate-400">Loading…</p>}
 
       {!loading && <>
-          {showRenewalReminder && <div className="mt-6 rounded-md bg-amber-50 border border-amber-200 px-4 py-3 flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-              <p className="text-sm text-amber-800">
-                Your subscription {renewalDaysLeft === 0 ? "expires today" : `renews in ${renewalDaysLeft} day${renewalDaysLeft === 1 ? "" : "s"}`}.
-              </p>
-            </div>}
-
           
           <div className="mt-6 bg-white rounded-lg border border-slate-200 p-5">
-            <p className="text-sm font-medium text-slate-500">Current Plan</p>
-            {subscription ? <div className="mt-2">
-                <div className="flex items-center gap-3">
+            <p className="text-sm font-medium text-slate-500">
+              {subscription?.isTrial ? "30-Day Access" : "Current Plan"}
+            </p>
+            {subscription && subscription.plan ? <div className="mt-2">
+                <div className="flex items-center gap-3 flex-wrap">
                   <p className="text-xl font-semibold text-slate-800">{subscription.plan}</p>
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[subscription.status] || "bg-slate-100 text-slate-500"}`}>
-                    {subscription.status}
+                    {subscription.hasAccess ? subscription.status : "expired"}
                   </span>
                 </div>
-                <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-slate-400 text-xs">Next Billing Date</p>
-                    <p className="text-slate-700 font-medium">{new Date(subscription.endDate).toLocaleDateString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-400 text-xs">Renewal</p>
-                    <p className="text-slate-700 font-medium">{subscription.autoRenew ? "Automatic" : "Manual"}</p>
-                  </div>
-                </div>
+
+                
+                {subscription.hasAccess ? <div className="mt-3 flex flex-wrap gap-x-8 gap-y-2">
+                    <div>
+                      <p className="text-xs text-slate-500">Days remaining</p>
+                      <p className="text-2xl font-semibold text-slate-800">
+                        {subscription.daysRemaining}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Started</p>
+                      <p className="text-sm text-slate-700 mt-1">
+                        {new Date(subscription.startDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Ends</p>
+                      <p className="text-sm text-slate-700 mt-1">
+                        {new Date(subscription.endDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Renews</p>
+                      <p className="text-sm text-slate-700 mt-1">
+                        {subscription.autoRenew ? "Automatically" : "Manually"}
+                      </p>
+                    </div>
+                  </div> : <div className="mt-3 rounded-md bg-red-50 border border-red-200 px-3 py-2">
+                    <p className="text-sm text-red-800 font-medium">
+                      {subscription.isTrial ? "Your 30-day access period has expired." : "Your subscription has expired."}
+                    </p>
+                    <p className="text-sm text-red-700 mt-0.5">
+                      Ended {new Date(subscription.endDate).toLocaleDateString()}. Choose a plan
+                      below to restore access — your data, customers and settings are all still here.
+                    </p>
+                  </div>}
               </div> : <p className="mt-2 text-slate-500">No active subscription — choose a plan below to get started.</p>}
           </div>
 
+          
           {verifyMessage && <div className="mt-6 rounded-md bg-slate-100 border border-slate-200 px-4 py-3 text-sm text-slate-700">
               {verifyMessage}
             </div>}
 
+          
           {pendingReference && <div className="mt-6 rounded-md bg-amber-50 border border-amber-200 px-4 py-3">
               <p className="text-sm text-amber-800">
                 Checkout opened in a new tab. Complete the payment there, then come back and verify it here —
@@ -154,104 +152,26 @@ function SubscriptionPage() {
 
           
           <div className="mt-8">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-medium text-slate-500">Available Plans</p>
-              <button onClick={() => setShowCompare(s => !s)} className="text-sm text-sky-600 hover:underline">
-                {showCompare ? "Hide comparison" : "Compare Plans"}
-              </button>
+            <p className="text-sm font-medium text-slate-500 mb-3">Available Plans</p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {plans.map(plan => <div key={plan.id} className="bg-white rounded-lg border border-slate-200 p-5">
+                  <p className="font-semibold text-slate-800">{plan.name}</p>
+                  <p className="mt-1 text-2xl font-semibold text-slate-800">
+                    GHS {plan.price}
+                    <span className="text-sm font-normal text-slate-400"> / {plan.billingCycle}</span>
+                  </p>
+                  <ul className="mt-3 space-y-1 text-sm text-slate-500">
+                    <li>Up to {plan.maxBranches} branches</li>
+                    <li>Up to {plan.maxUsers} users</li>
+                    {plan.features.map(f => <li key={f.key}>
+                        {f.key}: {f.value}
+                      </li>)}
+                  </ul>
+                  <button onClick={() => handleSubscribe(plan.id)} disabled={startingCheckoutPlanId === plan.id} className="mt-4 w-full rounded-md bg-sky-600 text-white py-2 text-sm font-medium hover:bg-sky-500 disabled:opacity-50 transition-colors">
+                    {startingCheckoutPlanId === plan.id ? "Starting checkout…" : "Subscribe"}
+                  </button>
+                </div>)}
             </div>
-
-            <div className="grid sm:grid-cols-3 gap-4">
-              {plans.map((plan, index) => {
-            const Icon = PLAN_ICONS[index % PLAN_ICONS.length];
-            const isCurrentPlan = subscription?.plan === plan.name;
-            const isRecommended = plan.id === recommendedPlanId;
-            return <div key={plan.id} className={`relative rounded-lg border p-5 ${isRecommended ? "border-sky-400 shadow-md" : "border-slate-200"} ${isCurrentPlan ? "bg-sky-50" : "bg-white"}`}>
-                    {isRecommended && !isCurrentPlan && <span className="absolute -top-2.5 left-4 rounded-full bg-sky-600 text-white text-xs font-medium px-2 py-0.5">
-                        Recommended
-                      </span>}
-                    {isCurrentPlan && <span className="absolute -top-2.5 left-4 rounded-full bg-green-600 text-white text-xs font-medium px-2 py-0.5">
-                        Current Plan
-                      </span>}
-
-                    <Icon className="w-6 h-6 text-sky-600" />
-                    <p className="mt-2 font-semibold text-slate-800">{plan.name}</p>
-                    <p className="mt-1 text-2xl font-semibold text-slate-800">
-                      GHS {plan.price}
-                      <span className="text-sm font-normal text-slate-400"> / {plan.billingCycle}</span>
-                    </p>
-                    <ul className="mt-3 space-y-1.5 text-sm text-slate-600">
-                      <li className="flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-green-600 shrink-0" /> {formatLimit(plan.maxBranches, "branches")}
-                      </li>
-                      <li className="flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-green-600 shrink-0" /> {formatLimit(plan.maxUsers, "users")}
-                      </li>
-                      {plan.features.map(f => ({
-                  raw: f,
-                  label: formatFeature(f)
-                })).filter(f => f.label !== null).map(f => <li key={f.raw.key} className="flex items-center gap-1.5">
-                            <Check className="w-3.5 h-3.5 text-green-600 shrink-0" /> {f.label}
-                          </li>)}
-                    </ul>
-                    <button onClick={() => handleSubscribe(plan.id)} disabled={isCurrentPlan || startingCheckoutPlanId === plan.id} className="mt-4 w-full rounded-md bg-sky-600 text-white py-2 text-sm font-medium hover:bg-sky-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                      {isCurrentPlan ? "Current Plan" : startingCheckoutPlanId === plan.id ? "Starting checkout…" : subscription ? "Upgrade" : "Subscribe"}
-                    </button>
-                  </div>;
-          })}
-            </div>
-
-            {showCompare && plans.length > 0 && <div className="mt-4 bg-white rounded-lg border border-slate-200 overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead className="bg-slate-50 text-slate-500">
-                    <tr>
-                      <th className="px-4 py-2 font-medium">Feature</th>
-                      {plans.map(p => <th key={p.id} className="px-4 py-2 font-medium">{p.name}</th>)}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    <tr>
-                      <td className="px-4 py-2 text-slate-600">Price</td>
-                      {plans.map(p => <td key={p.id} className="px-4 py-2 font-medium text-slate-800">GHS {p.price}</td>)}
-                    </tr>
-                    <tr>
-                      <td className="px-4 py-2 text-slate-600">Branches</td>
-                      {plans.map(p => <td key={p.id} className="px-4 py-2 text-slate-700">{p.maxBranches != null ? p.maxBranches : "Unlimited"}</td>)}
-                    </tr>
-                    <tr>
-                      <td className="px-4 py-2 text-slate-600">Users</td>
-                      {plans.map(p => <td key={p.id} className="px-4 py-2 text-slate-700">{p.maxUsers != null ? p.maxUsers : "Unlimited"}</td>)}
-                    </tr>
-                  </tbody>
-                </table>
-              </div>}
-          </div>
-
-          
-          <div className="mt-8 bg-white rounded-lg border border-slate-200 overflow-hidden">
-            <p className="text-sm font-medium text-slate-500 px-5 pt-5 pb-3">Payment History</p>
-            {payments.length === 0 ? <p className="text-sm text-slate-400 px-5 pb-5">No payments yet.</p> : <table className="w-full text-sm text-left">
-                <thead className="bg-slate-50 text-slate-500">
-                  <tr>
-                    <th className="px-5 py-2 font-medium">Date</th>
-                    <th className="px-5 py-2 font-medium">Amount</th>
-                    <th className="px-5 py-2 font-medium">Status</th>
-                    <th className="px-5 py-2 font-medium">Reference</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {payments.map(p => <tr key={p.id}>
-                      <td className="px-5 py-2 text-slate-600">{new Date(p.createdAt).toLocaleDateString()}</td>
-                      <td className="px-5 py-2 font-medium text-slate-800">{p.currency} {p.amount}</td>
-                      <td className="px-5 py-2">
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${PAYMENT_STATUS_STYLES[p.status] || "bg-slate-100 text-slate-500"}`}>
-                          {p.status}
-                        </span>
-                      </td>
-                      <td className="px-5 py-2 text-slate-400 text-xs">{p.gatewayReference}</td>
-                    </tr>)}
-                </tbody>
-              </table>}
           </div>
         </>}
     </div>;
