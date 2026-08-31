@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import SupportThread from "../../components/SupportThread";
 import { createTicket, listMyTickets, getTicket } from "../../api/support";
 import { searchOrganizations } from "../../api/publicOrg";
@@ -126,6 +127,7 @@ function SupportPage() {
               </div>)}
           </div>}
       </div>
+      <Footer />
     </div>;
 }
 export default SupportPage;

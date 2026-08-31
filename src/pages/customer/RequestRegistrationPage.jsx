@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { submitOrganizationRequest } from "../../api/organizationRequests";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 function RequestRegistrationPage() {
   useDocumentTitle("Request Organization Registration");
   const [form, setForm] = useState({
@@ -121,6 +122,7 @@ function RequestRegistrationPage() {
         </form>
         </main>
       </div>
+      <Footer />
     </div>;
 }
 export default RequestRegistrationPage;

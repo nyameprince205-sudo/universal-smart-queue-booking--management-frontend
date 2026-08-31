@@ -4,6 +4,7 @@ import SubscriptionBanner from "../components/SubscriptionBanner";
 import { LayoutDashboard, Calendar, Ticket, Building2, Wrench, UserCog, BarChart3, Gauge, FileText, CreditCard, Settings, LifeBuoy, ChevronsLeft, ChevronsRight, Menu, X, Users } from "lucide-react";
 import ProfileDropdown from "../components/ProfileDropdown";
 import NotificationBell from "../components/NotificationBell";
+import AppFooter from "../components/AppFooter";
 const NAV_ITEMS = [{
   to: "/admin/dashboard",
   label: "Dashboard",
@@ -131,6 +132,8 @@ function AdminLayout() {
         
         <SubscriptionBanner />
         <Outlet />
+                <Outlet />
+        <AppFooter />
       </main>
     </div>;
 }

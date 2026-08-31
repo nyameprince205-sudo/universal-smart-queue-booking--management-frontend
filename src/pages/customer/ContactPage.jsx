@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin } from "lucide-react";
 import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import { submitContactForm } from "../../api/contact";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 function ContactPage() {
@@ -104,6 +105,7 @@ function ContactPage() {
             </form>}
         </div>
       </main>
+      <Footer />
     </div>;
 }
 export default ContactPage;

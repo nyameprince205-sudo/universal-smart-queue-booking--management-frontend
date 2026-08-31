@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { searchOrganizations } from "../../api/publicOrg";
 import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 function OrganizationSearchPage() {
   const [searchParams] = useSearchParams();
@@ -63,6 +64,7 @@ function OrganizationSearchPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>;
 }
 export default OrganizationSearchPage;

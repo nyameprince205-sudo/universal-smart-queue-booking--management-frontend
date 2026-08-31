@@ -1,4 +1,5 @@
 import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 function AboutPage() {
   useDocumentTitle("About Us");
@@ -52,6 +53,7 @@ function AboutPage() {
           </ul>
         </section>
       </div>
+      <Footer />
     </div>;
 }
 export default AboutPage;

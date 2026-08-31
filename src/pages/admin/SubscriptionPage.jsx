@@ -163,7 +163,7 @@ function SubscriptionPage() {
                         <p className="text-slate-700 font-medium">{subscription.autoRenew ? "Automatic" : "Manual"}</p>
                       </div>
                     </div>
-                  </> : (<div className="mt-3 rounded-md bg-red-50 border border-red-200 px-3 py-3">
+                  </> : <div className="mt-3 rounded-md bg-red-50 border border-red-200 px-3 py-3">
                     <p className="text-sm text-red-800 font-medium">
                       {subscription.isTrial ? "Your 30-day access period has expired." : "Your subscription has expired."}
                     </p>
@@ -172,7 +172,7 @@ function SubscriptionPage() {
                       to restore access — your branches, staff, customers, bookings and settings are
                       all still here, exactly as you left them.
                     </p>
-                  </div>)}
+                  </div>}
               </div> : <p className="mt-2 text-slate-500">No active subscription — choose a plan below to get started.</p>}
           </div>
 

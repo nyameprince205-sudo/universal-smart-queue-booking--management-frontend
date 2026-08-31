@@ -5,6 +5,7 @@ import { searchOrganizations } from "../../api/publicOrg";
 import { listMyBookings } from "../../api/myBookings";
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 import useCustomerBookingUpdates from "../../hooks/useCustomerBookingUpdates";
 import { formatBookingTime } from "../../utils/formatBookingTime";
@@ -119,6 +120,7 @@ function HomePage() {
             </div>}
         </div>
       </div>
+      <Footer />
     </div>;
 }
 export default HomePage;
