@@ -4,6 +4,7 @@ import { searchOrganizations } from "../../api/publicOrg";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
+import LiveQueueStatus from "../../components/LiveQueueStatus";
 function OrganizationSearchPage() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");

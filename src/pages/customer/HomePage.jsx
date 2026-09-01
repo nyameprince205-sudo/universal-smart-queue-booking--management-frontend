@@ -5,6 +5,9 @@ import { searchOrganizations } from "../../api/publicOrg";
 import { listMyBookings } from "../../api/myBookings";
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/Navbar";
+import PlatformQueueStats from "../../components/PlatformQueueStats";
+import QueueTicketPreview from "../../components/QueueTicketPreview";
+import HowItWorks from "../../components/HowItWorks";
 import Footer from "../../components/Footer";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 import useCustomerBookingUpdates from "../../hooks/useCustomerBookingUpdates";
@@ -103,6 +106,10 @@ function HomePage() {
           </button>
         </form>
 
+        <PlatformQueueStats />
+
+        <QueueTicketPreview />
+
         <div className="mt-16 text-left">
           <p className="text-sm font-medium text-warm-muted mb-4">Popular Organizations</p>
           {loadingPopular && <p className="text-warm-muted text-sm">Loading…</p>}
@@ -120,6 +127,7 @@ function HomePage() {
             </div>}
         </div>
       </div>
+      <HowItWorks />
       <Footer />
     </div>;
 }

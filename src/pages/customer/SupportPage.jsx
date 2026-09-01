@@ -6,8 +6,14 @@ import SupportThread from "../../components/SupportThread";
 import { createTicket, listMyTickets, getTicket } from "../../api/support";
 import { searchOrganizations } from "../../api/publicOrg";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
+import { useAuth } from "../../context/AuthContext";
 function SupportPage() {
   useDocumentTitle("Support");
+  const {
+    isAuthenticated,
+    authType
+  } = useAuth();
+  const isLoggedInCustomer = isAuthenticated && authType === "customer";
   const [tickets, setTickets] = useState([]);
   const [activeTicket, setActiveTicket] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,6 +27,10 @@ function SupportPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const loadTickets = useCallback(async () => {
+    if (!isLoggedInCustomer) {
+      setLoading(false);
+      return;
+    }
     try {
       const data = await listMyTickets();
       setTickets(data);
@@ -29,7 +39,7 @@ function SupportPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isLoggedInCustomer]);
   useEffect(() => {
     loadTickets();
   }, [loadTickets]);
@@ -70,9 +80,9 @@ function SupportPage() {
         <Link to="/" className="inline-flex items-center gap-1 text-sm text-forest-600 hover:underline mb-4">← Back to Home</Link>
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-display text-2xl font-semibold text-warm-ink">Support</h1>
-          <button onClick={() => setShowNew(true)} className="rounded-md bg-forest-600 text-white px-4 py-2 text-sm font-medium hover:bg-forest-700 transition-colors">
+          {isLoggedInCustomer && <button onClick={() => setShowNew(true)} className="rounded-md bg-forest-600 text-white px-4 py-2 text-sm font-medium hover:bg-forest-700 transition-colors">
             New Ticket
-          </button>
+          </button>}
         </div>
 
         {error && <div className="mb-4 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
@@ -117,7 +127,15 @@ function SupportPage() {
 
         {!activeTicket && <div>
             {loading && <p className="text-warm-muted">Loading…</p>}
-            {!loading && tickets.length === 0 && <p className="text-warm-muted">No support tickets yet.</p>}
+            {!loading && tickets.length === 0 && !isLoggedInCustomer && <div className="bg-warm-card rounded-lg border border-warm-border p-6 text-center">
+                <p className="text-warm-ink font-medium">Sign in to raise a support ticket</p>
+                <p className="text-sm text-warm-muted-2 mt-1">Your conversations with a business stay in your account, so you can follow the reply.</p>
+                <div className="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
+                  <Link to="/customer/login" className="rounded-md bg-forest-600 text-white px-4 py-2 text-sm font-medium hover:bg-forest-700 transition-colors">Sign In</Link>
+                  <Link to="/customer/register" className="rounded-md border border-warm-border text-warm-ink px-4 py-2 text-sm font-medium hover:bg-warm-bg transition-colors">Create an Account</Link>
+                </div>
+              </div>}
+            {!loading && tickets.length === 0 && isLoggedInCustomer && <p className="text-warm-muted">No support tickets yet.</p>}
             {tickets.map(t => <div key={t.id} onClick={() => openTicket(t.id)} className="bg-warm-card rounded-lg border border-warm-border p-4 mb-3 cursor-pointer hover:border-forest-400 transition-colors">
                 <div className="flex items-center justify-between">
                   <p className="font-medium text-warm-ink">{t.subject}</p>
