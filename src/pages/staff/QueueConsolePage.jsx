@@ -9,6 +9,7 @@ import { formatBookingTime } from "../../utils/formatBookingTime";
 import { listBranches } from "../../api/branches";
 import { listServices } from "../../api/services";
 import { createQueueSocket } from "../../api/socket";
+import apiClient from "../../api/client";
 const STATUS_LABELS = {
   waiting: "Waiting",
   called: "Called",
@@ -38,6 +39,7 @@ function TicketCard({
 const AWAITING_STATUSES = ["pending", "confirmed"];
 function TodaysBookingsPanel({
   branchId,
+  serviceIds,
   onCheckedIn
 }) {
   const [bookings, setBookings] = useState(null);
@@ -47,11 +49,11 @@ function TodaysBookingsPanel({
     setError(null);
     try {
       const data = await listBookings(undefined, branchId);
-      setBookings(data.filter(b => AWAITING_STATUSES.includes(b.status)));
+      setBookings(data.filter(b => AWAITING_STATUSES.includes(b.status) && (!serviceIds || serviceIds.some(id => String(id) === String(b.serviceId)))));
     } catch (err) {
       setError(err.response?.data?.error || "Couldn't load bookings.");
     }
-  }, [branchId]);
+  }, [branchId, serviceIds]);
   useEffect(() => {
     load();
   }, [load]);
@@ -235,9 +237,13 @@ function QueueConsolePage() {
   const [branches, setBranches] = useState([]);
   const [branchId, setBranchId] = useState(profile?.branchId || null);
   const [board, setBoard] = useState([]);
+  const [myCounter, setMyCounter] = useState(undefined);
+  const isOrgAdmin = profile?.role === "ORG_ADMIN";
   const [counters, setCounters] = useState([]);
   const [selectedCounterId, setSelectedCounterId] = useState("");
   const [services, setServices] = useState([]);
+  const [myServiceIds, setMyServiceIds] = useState(null);
+  const myServiceIdsRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionError, setActionError] = useState(null);
@@ -250,16 +256,30 @@ function QueueConsolePage() {
     setLoading(true);
     setError(null);
     try {
-      const [boardData, countersData, servicesData] = await Promise.all([getBoard(currentBranchId), listCounters(currentBranchId), listServices()]);
+      const [boardData, servicesData, counterRes] = await Promise.all([getBoard(currentBranchId), listServices(), apiClient.get("/queue/my-counter").catch(() => ({
+        data: {
+          counter: null
+        }
+      }))]);
       setBoard(boardData);
-      setCounters(countersData);
       setServices(servicesData);
+      setMyCounter(counterRes.data.counter);
+      if (!isOrgAdmin) {
+        const mine = await apiClient.get("/staff/my-services").then(r => r.data).catch(() => null);
+        const ids = mine && !mine.handlesAllServices ? mine.serviceIds : null;
+        setMyServiceIds(ids);
+        myServiceIdsRef.current = ids;
+      }
+      if (isOrgAdmin) {
+        const countersData = await listCounters(currentBranchId).catch(() => []);
+        setCounters(countersData);
+      }
     } catch (err) {
       setError(err.response?.data?.error || "Couldn't load the queue.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isOrgAdmin]);
   useEffect(() => {
     if (!branchId) return;
     loadBoardAndCounters(branchId);
@@ -267,7 +287,10 @@ function QueueConsolePage() {
     socketRef.current = socket;
     socket.connect();
     socket.emit("join-branch-queue", branchId);
-    socket.on("queue:update", updatedBoard => setBoard(updatedBoard));
+    socket.on("queue:update", updatedBoard => {
+      const allowed = myServiceIdsRef.current;
+      setBoard(allowed ? updatedBoard.filter(t => allowed.some(id => String(id) === String(t.serviceId))) : updatedBoard);
+    });
     return () => {
       socket.emit("leave-branch-queue", branchId);
       socket.disconnect();
@@ -277,7 +300,7 @@ function QueueConsolePage() {
   async function handleCallNext() {
     setActionError(null);
     try {
-      await callNext(selectedCounterId);
+      await callNext(isOrgAdmin ? selectedCounterId : myCounter.id);
     } catch (err) {
       setActionError(err.response?.data?.error || "Couldn't call the next customer.");
     }
@@ -342,23 +365,41 @@ function QueueConsolePage() {
           <div className="bg-white rounded-lg border border-slate-200 p-5">
             <p className="text-sm font-medium text-slate-500 mb-3">Call Next Customer</p>
             {actionError && <p className="mb-2 text-sm text-red-600">{actionError}</p>}
-            <select value={selectedCounterId} onChange={e => setSelectedCounterId(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800 mb-3">
-              <option value="">Select your counter…</option>
-              {counters.map(c => <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>)}
-            </select>
-            {counters.length === 0 && <p className="text-xs text-slate-400 mb-3">
-                No counters set up for this branch yet — ask your Org Admin to add one.
-              </p>}
-            <button onClick={handleCallNext} disabled={!selectedCounterId} className="w-full rounded-md bg-slate-800 text-white py-2 text-sm font-medium hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            {isOrgAdmin ? <>
+                <select value={selectedCounterId} onChange={e => setSelectedCounterId(e.target.value)} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800 mb-3">
+                  <option value="">Which counter are you on?</option>
+                  {counters.map(c => <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>)}
+                </select>
+                {counters.length === 0 && <p className="text-xs text-slate-400 mb-3">
+                    No counters set up for this branch yet — add one from Branches.
+                  </p>}
+              </> : <>
+                {myCounter === undefined && <p className="text-sm text-slate-400 mb-3">Loading your counter…</p>}
+
+                {myCounter === null && <div className="mb-3 rounded-md bg-amber-50 border border-amber-200 px-3 py-2">
+                    <p className="text-sm text-amber-800 font-medium">No counter assigned to you</p>
+                    <p className="text-xs text-amber-700 mt-0.5">
+                      Ask your Org Admin to assign you one before calling customers.
+                    </p>
+                  </div>}
+
+                {myCounter && <div className="mb-3 rounded-md bg-slate-50 border border-slate-200 px-3 py-2">
+                    <p className="text-xs text-slate-500">You are on</p>
+                    <p className="text-lg font-semibold text-slate-800 leading-tight">{myCounter.name}</p>
+                    {myCounter.branchName && <p className="text-xs text-slate-400">{myCounter.branchName}</p>}
+                  </div>}
+              </>}
+
+            <button onClick={handleCallNext} disabled={isOrgAdmin ? !selectedCounterId : !myCounter} className="w-full rounded-md bg-slate-800 text-white py-2 text-sm font-medium hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               Call Next
             </button>
           </div>
 
-          <TodaysBookingsPanel branchId={branchId} onCheckedIn={() => {}} />
+          <TodaysBookingsPanel branchId={branchId} serviceIds={myServiceIds} onCheckedIn={() => {}} />
 
-          <WalkInPanel branchId={branchId} services={services} onCheckedIn={() => {}} />
+          <WalkInPanel branchId={branchId} services={myServiceIds ? services.filter(s => myServiceIds.some(id => String(id) === String(s.id))) : services} onCheckedIn={() => {}} />
         </div>
 
         <div className="lg:col-span-2">

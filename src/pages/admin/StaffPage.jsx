@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { listStaff, createStaff, deactivateStaff, reactivateStaff } from "../../api/staff";
 import { listBranches } from "../../api/branches";
 import Modal from "../../components/Modal";
+import AssignStaffModal from "../../components/AssignStaffModal";
 function CreateStaffForm({
   branches,
   onSubmit
@@ -66,6 +67,7 @@ function StaffPage() {
   const [error, setError] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [actioningId, setActioningId] = useState(null);
+  const [assigningStaff, setAssigningStaff] = useState(null);
   const loadAll = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -146,7 +148,13 @@ function StaffPage() {
                         {s.emailVerified ? "Verified" : "Pending"}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      {isActive && <>
+                          <button onClick={() => setAssigningStaff(s)} className="text-sm font-medium text-sky-600 hover:underline">
+                            Assign
+                          </button>
+                          <span className="text-slate-300 mx-2">|</span>
+                        </>}
                       <button onClick={() => handleToggleStatus(s)} disabled={actioningId === s.id} className={`text-sm font-medium hover:underline disabled:opacity-50 ${isActive ? "text-red-600" : "text-sky-600"}`}>
                         {actioningId === s.id ? "Working…" : isActive ? "Deactivate" : "Reactivate"}
                       </button>
@@ -159,6 +167,13 @@ function StaffPage() {
 
       {showAddModal && <Modal title="Add Staff Account" onClose={() => setShowAddModal(false)}>
           <CreateStaffForm branches={branches} onSubmit={handleCreate} />
+        </Modal>}
+
+      {assigningStaff && <Modal title={`Assign ${assigningStaff.name}`} onClose={() => setAssigningStaff(null)}>
+          <AssignStaffModal staff={assigningStaff} onClose={() => setAssigningStaff(null)} onSaved={() => {
+        setAssigningStaff(null);
+        loadAll();
+      }} />
         </Modal>}
     </div>;
 }

@@ -6,7 +6,6 @@ import { listMyBookings } from "../../api/myBookings";
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/Navbar";
 import PlatformQueueStats from "../../components/PlatformQueueStats";
-import QueueTicketPreview from "../../components/QueueTicketPreview";
 import HowItWorks from "../../components/HowItWorks";
 import Footer from "../../components/Footer";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
@@ -107,25 +106,6 @@ function HomePage() {
         </form>
 
         <PlatformQueueStats />
-
-        <QueueTicketPreview />
-
-        <div className="mt-16 text-left">
-          <p className="text-sm font-medium text-warm-muted mb-4">Popular Organizations</p>
-          {loadingPopular && <p className="text-warm-muted text-sm">Loading…</p>}
-          {!loadingPopular && popularOrgs.length === 0 && <div className="bg-warm-card rounded-lg border border-warm-border p-6 text-center">
-              <p className="text-warm-muted-2">Can't find your organization?</p>
-              <Link to="/request-registration" className="mt-3 inline-block rounded-md bg-forest-600 text-white px-4 py-2 text-sm font-medium hover:bg-forest-700 transition-colors">
-                Request Organization Registration
-              </Link>
-            </div>}
-          {!loadingPopular && popularOrgs.length > 0 && <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {popularOrgs.map(org => <Link key={org.id} to={`/book/${org.slug}`} className="block bg-warm-card rounded-lg border border-warm-border p-4 hover:border-forest-400 transition-colors">
-                  <p className="font-medium text-warm-ink">{org.name}</p>
-                  <p className="text-sm text-warm-muted">{org.businessType?.name}</p>
-                </Link>)}
-            </div>}
-        </div>
       </div>
       <HowItWorks />
       <Footer />

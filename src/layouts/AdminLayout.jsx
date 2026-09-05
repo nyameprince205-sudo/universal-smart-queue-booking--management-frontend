@@ -132,7 +132,6 @@ function AdminLayout() {
         
         <SubscriptionBanner />
         <Outlet />
-                <Outlet />
         <AppFooter />
       </main>
     </div>;
