@@ -117,7 +117,7 @@ function OrganizationsTab({
   setShowAddModal
 }) {
   return <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <p className="text-sm text-warm-muted-2">{organizations.length} organization{organizations.length === 1 ? "" : "s"} on the platform</p>
         <button onClick={() => setShowAddModal(true)} className="rounded-md bg-forest-600 text-white px-4 py-2 text-sm font-medium hover:bg-forest-700 transition-colors">
           Add Organization
@@ -126,7 +126,28 @@ function OrganizationsTab({
 
       {loading && <p className="mt-8 text-warm-muted">Loading…</p>}
 
-      {!loading && <div className="mt-4 bg-white rounded-lg border border-warm-border overflow-hidden">
+      
+      {!loading && <div className="mt-4 space-y-3 sm:hidden">
+          {organizations.map(org => <div key={org.id} className="bg-white rounded-lg border border-warm-border p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-medium text-warm-ink truncate">{org.name}</p>
+                  <p className="text-xs text-warm-muted">{org.businessType?.name}</p>
+                </div>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${ORG_STATUS_STYLES[org.status]}`}>{org.status}</span>
+              </div>
+              <p className="mt-2 text-sm text-warm-muted-2 break-all">{org.email}</p>
+              <div className="mt-3"><SubscriptionCell subscription={org.subscription} /></div>
+              <div className="mt-3 pt-3 border-t border-warm-border">
+                <label className="block text-xs text-warm-muted mb-1">Change status</label>
+                <select value={org.status} disabled={updatingStatusId === org.id} onChange={e => onStatusChange(org, e.target.value)} className="w-full text-sm rounded border border-warm-border px-2 py-1.5 text-warm-muted-2 disabled:opacity-50">
+                  {ALL_ORG_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>)}
+        </div>}
+
+      {!loading && <div className="mt-4 bg-white rounded-lg border border-warm-border overflow-hidden hidden sm:block">
           <table className="w-full text-sm text-left">
             <thead className="bg-warm-bg text-warm-muted-2">
               <tr>
@@ -301,7 +322,29 @@ function OrgAdminsTab({
       {loading && <p className="mt-8 text-warm-muted">Loading…</p>}
       {!loading && orgAdmins.length === 0 && <p className="mt-8 text-warm-muted">No Org Admins yet.</p>}
 
-      {!loading && orgAdmins.length > 0 && <div className="mt-4 bg-white rounded-lg border border-warm-border overflow-hidden">
+      {!loading && orgAdmins.length > 0 && <div className="mt-4 space-y-3 sm:hidden">
+          {orgAdmins.map(a => {
+        const isActive = a.status === "active";
+        return <div key={a.id} className={`rounded-lg border border-warm-border p-4 ${isActive ? "bg-white" : "bg-warm-bg"}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium text-warm-ink truncate">{a.name}</p>
+                    <p className="text-xs text-warm-muted">{a.organizationName || "—"}</p>
+                  </div>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${ADMIN_STATUS_STYLES[a.status] || "bg-slate-100 text-warm-muted-2"}`}>
+                    {isActive ? "Active" : "Deactivated"}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-warm-muted-2 break-all">{a.email}</p>
+                {a.phone && <p className="text-xs text-warm-muted">{a.phone}</p>}
+                <button onClick={() => onToggleStatus(a)} disabled={actioningId === a.id} className={`mt-3 text-sm font-medium hover:underline disabled:opacity-50 ${isActive ? "text-red-600" : "text-forest-600"}`}>
+                  {actioningId === a.id ? "Working…" : isActive ? "Deactivate" : "Reactivate"}
+                </button>
+              </div>;
+      })}
+        </div>}
+
+      {!loading && orgAdmins.length > 0 && <div className="mt-4 bg-white rounded-lg border border-warm-border overflow-hidden hidden sm:block">
           <table className="w-full text-sm text-left">
             <thead className="bg-warm-bg text-warm-muted">
               <tr>
@@ -508,17 +551,18 @@ function PlatformPage() {
   }];
   return <div className="min-h-screen bg-warm-bg font-sans">
       <div className="bg-warm-ink">
-        <div className="max-w-5xl mx-auto px-8 py-6 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-5 sm:py-6 flex items-center justify-between gap-4">
           <div>
             <p className="text-xs font-medium tracking-widest text-white/50 uppercase">Super Admin</p>
-            <h1 className="mt-1 font-display text-2xl font-semibold text-white">Platform Dashboard</h1>
+            <h1 className="mt-1 font-display text-xl sm:text-2xl font-semibold text-white">Platform Dashboard</h1>
           </div>
           <LogoutButton className="text-sm font-medium text-white/70 hover:text-white transition-colors" />
         </div>
 
-        <div className="max-w-5xl mx-auto px-8">
-          <div className="flex gap-1">
-            {TABS.map(tab => <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`relative px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.key ? "border-gold-600 text-white" : "border-transparent text-white/50 hover:text-white/80"}`}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-8">
+          
+          <div className="flex gap-1 overflow-x-auto scrollbar-none -mb-px">
+            {TABS.map(tab => <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`relative px-3 sm:px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap shrink-0 transition-colors ${activeTab === tab.key ? "border-gold-600 text-white" : "border-transparent text-white/50 hover:text-white/80"}`}>
                 {tab.label}
                 {tab.badge > 0 && <span className="ml-2 inline-flex items-center justify-center rounded-full bg-gold-600 text-warm-ink text-xs font-semibold w-5 h-5">
                     {tab.badge}
@@ -528,7 +572,7 @@ function PlatformPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-8">
         {error && <div className="mb-6 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
 
         {activeTab === "organizations" && <OrganizationsTab organizations={organizations} businessTypes={businessTypes} loading={orgsLoading} onCreate={handleCreateOrg} onStatusChange={handleOrgStatusChange} updatingStatusId={updatingStatusId} showAddModal={showAddModal} setShowAddModal={setShowAddModal} />}
