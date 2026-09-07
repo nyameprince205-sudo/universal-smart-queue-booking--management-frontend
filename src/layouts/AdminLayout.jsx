@@ -75,7 +75,8 @@ function AdminLayout() {
           <Menu className="w-5 h-5" />
         </button>
         <p className="text-sm font-medium">Org Admin</p>
-        <NotificationBell />
+        
+        <span className="w-7" aria-hidden="true" />
       </div>
 
       
@@ -87,9 +88,7 @@ function AdminLayout() {
           {!collapsed && <p className="text-xs font-medium tracking-wide text-slate-400 uppercase pl-2 hidden md:block">Org Admin</p>}
           <p className="text-xs font-medium tracking-wide text-slate-400 uppercase pl-2 md:hidden">Org Admin</p>
           <div className="flex items-center gap-1">
-            <div className="hidden md:block">
-              <NotificationBell />
-            </div>
+            <NotificationBell />
             <button onClick={toggleCollapsed} className="hidden md:block p-1.5 rounded-md hover:bg-slate-700/50 text-slate-400 shrink-0">
               {collapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
             </button>
