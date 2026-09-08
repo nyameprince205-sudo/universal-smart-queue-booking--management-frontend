@@ -14,7 +14,11 @@ function ProfileDropdown() {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
   return <div className="relative" ref={ref}>
       <button onClick={() => setOpen(o => !o)} className="w-full flex items-center gap-2 text-left hover:bg-slate-700/50 rounded-md px-2 py-1.5 transition-colors">

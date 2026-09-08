@@ -28,7 +28,7 @@ function OverviewTab({
   const mostPopular = services.services.slice(0, 5);
   const leastPopular = services.services.slice(-5).reverse();
   return <div className="mt-6 space-y-6">
-      <div className="bg-white rounded-lg border border-slate-200 p-5">
+      <div className="bg-white rounded-lg border border-slate-200 p-3 sm:p-5">
         <p className="text-sm font-medium text-slate-500 mb-4">Peak Hours (ticket volume by hour of day)</p>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={peakHours.byHour}>
@@ -86,7 +86,7 @@ function TrendsTab({
     }).then(setTrend).catch(err => setError(err.response?.data?.error || "Couldn't load trends.")).finally(() => setLoading(false));
   }, [filters, granularity]);
   return <div className="mt-6">
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-4 flex-wrap">
         {GRANULARITIES.map(g => <button key={g} onClick={() => setGranularity(g)} className={`px-3 py-1.5 rounded-md text-sm font-medium capitalize transition-colors ${granularity === g ? "bg-slate-800 text-white" : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"}`}>
             {g}ly
           </button>)}
@@ -140,7 +140,20 @@ function StaffBranchesTab({
         <p className="text-sm font-medium text-slate-500 px-5 pt-5 pb-3">Staff Performance</p>
         {staff.staff.length === 0 ? <p className="text-sm text-slate-400 px-5 pb-5">
             No data yet — this needs tickets called after the staff-attribution update shipped.
-          </p> : <table className="w-full text-sm text-left">
+          </p> : <>
+          
+          <div className="sm:hidden px-5 pb-5 space-y-3">
+            {staff.staff.map(s => <div key={s.userId} className="rounded-md border border-slate-200 p-3">
+                <p className="font-medium text-slate-800">{s.name}</p>
+                <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                  <div><span className="text-slate-400 text-xs block">Handled</span><span className="text-slate-700">{s.ticketsHandled}</span></div>
+                  <div><span className="text-slate-400 text-xs block">Completed</span><span className="text-slate-700">{s.completed}</span></div>
+                  <div><span className="text-slate-400 text-xs block">Missed</span><span className="text-slate-700">{s.missed}</span></div>
+                  <div><span className="text-slate-400 text-xs block">Avg service</span><span className="text-slate-700">{formatDuration(s.averageServiceTimeSeconds)}</span></div>
+                </div>
+              </div>)}
+          </div>
+          <table className="w-full text-sm text-left hidden sm:table">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
                 <th className="px-5 py-2 font-medium">Staff</th>
@@ -159,12 +172,24 @@ function StaffBranchesTab({
                   <td className="px-5 py-2 text-slate-600">{formatDuration(s.averageServiceTimeSeconds)}</td>
                 </tr>)}
             </tbody>
-          </table>}
+          </table>
+          </>}
       </div>
 
       <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         <p className="text-sm font-medium text-slate-500 px-5 pt-5 pb-3">Branch Comparison</p>
-        <table className="w-full text-sm text-left">
+        <div className="sm:hidden px-5 pb-5 space-y-3">
+          {branches.branches.map(b => <div key={b.branchId} className="rounded-md border border-slate-200 p-3">
+              <p className="font-medium text-slate-800">{b.branchName}</p>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                <div><span className="text-slate-400 text-xs block">Bookings</span><span className="text-slate-700">{b.totalBookings}</span></div>
+                <div><span className="text-slate-400 text-xs block">Served</span><span className="text-slate-700">{b.ticketsServed}</span></div>
+                <div><span className="text-slate-400 text-xs block">Avg wait</span><span className="text-slate-700">{formatDuration(b.averageWaitTimeSeconds)}</span></div>
+                <div><span className="text-slate-400 text-xs block">No-shows</span><span className="text-slate-700">{b.noShowRatePercent}%</span></div>
+              </div>
+            </div>)}
+        </div>
+        <table className="w-full text-sm text-left hidden sm:table">
           <thead className="bg-slate-50 text-slate-500">
             <tr>
               <th className="px-5 py-2 font-medium">Branch</th>
@@ -250,14 +275,15 @@ function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState("Overview");
   const [filters, setFilters] = useState(null);
   const handleRangeChange = useCallback(newFilters => setFilters(newFilters), []);
-  return <div className="p-8 max-w-5xl">
+  return <div className="p-4 sm:p-8 max-w-5xl">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-semibold text-slate-800">Analytics</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold text-slate-800">Analytics</h1>
         <DateRangePicker onChange={handleRangeChange} />
       </div>
 
-      <div className="mt-6 flex gap-1 border-b border-slate-200">
-        {TABS.map(tab => <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === tab ? "border-sky-600 text-sky-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
+      
+      <div className="mt-6 flex gap-1 border-b border-slate-200 overflow-x-auto scrollbar-none">
+        {TABS.map(tab => <button key={tab} onClick={() => setActiveTab(tab)} className={`px-3 sm:px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap shrink-0 transition-colors ${activeTab === tab ? "border-sky-600 text-sky-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
             {tab}
           </button>)}
       </div>
