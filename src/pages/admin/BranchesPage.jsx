@@ -84,14 +84,19 @@ function BranchesPage() {
   }
   async function toggleStatus(branch) {
     const newStatus = branch.status === "active" ? "inactive" : "active";
-    await updateBranch(branch.id, {
-      status: newStatus
-    });
-    await loadBranches();
+    setError(null);
+    try {
+      await updateBranch(branch.id, {
+        status: newStatus
+      });
+      await loadBranches();
+    } catch (err) {
+      setError(err.response?.data?.error || "Couldn't update this branch.");
+    }
   }
-  return <div className="p-8 max-w-4xl">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-800">Branches</h1>
+  return <div className="p-4 sm:p-8 max-w-4xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-semibold text-slate-800">Branches</h1>
         <button onClick={() => setShowAddModal(true)} className="rounded-md bg-sky-600 text-white px-4 py-2 text-sm font-medium hover:bg-sky-500 transition-colors">
           Add Branch
         </button>
@@ -103,7 +108,29 @@ function BranchesPage() {
 
       {!loading && branches.length === 0 && !error && <p className="mt-8 text-slate-400">No branches yet — add your first one.</p>}
 
-      {!loading && branches.length > 0 && <div className="mt-6 bg-white rounded-lg border border-slate-200 overflow-hidden">
+      
+      {!loading && branches.length > 0 && <div className="mt-6 sm:hidden space-y-3">
+          {branches.map(branch => <div key={branch.id} className="bg-white rounded-lg border border-slate-200 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-medium text-slate-800 truncate">{branch.name}</p>
+                <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${branch.status === "active" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"}`}>
+                  {branch.status}
+                </span>
+              </div>
+              {branch.address && <p className="mt-2 text-sm text-slate-500">{branch.address}</p>}
+              {branch.phone && <p className="text-sm text-slate-500">{branch.phone}</p>}
+              <div className="mt-3 pt-3 border-t border-slate-100 flex gap-4">
+                <button onClick={() => setEditingBranch(branch)} className="text-sm text-sky-600 hover:underline">
+                  Edit
+                </button>
+                <button onClick={() => toggleStatus(branch)} className="text-sm text-slate-500 hover:underline">
+                  {branch.status === "active" ? "Deactivate" : "Activate"}
+                </button>
+              </div>
+            </div>)}
+        </div>}
+
+      {!loading && branches.length > 0 && <div className="mt-6 bg-white rounded-lg border border-slate-200 overflow-hidden hidden sm:block">
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
