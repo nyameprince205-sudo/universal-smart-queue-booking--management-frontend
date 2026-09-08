@@ -144,8 +144,13 @@ function ServicesPage() {
   }
   async function handleDeactivate(service) {
     if (!window.confirm(`Deactivate "${service.name}"? Customers won't be able to book it anymore.`)) return;
-    await deactivateService(service.id);
-    await loadAll();
+    setError(null);
+    try {
+      await deactivateService(service.id);
+      await loadAll();
+    } catch (err) {
+      setError(err.response?.data?.error || "Couldn't deactivate this service.");
+    }
   }
   function branchName(branchId) {
     if (!branchId) return "All branches";
@@ -162,9 +167,9 @@ function ServicesPage() {
         </span>
       </span>;
   }
-  return <div className="p-8 max-w-5xl">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-800">Services</h1>
+  return <div className="p-4 sm:p-8 max-w-5xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-semibold text-slate-800">Services</h1>
         <button onClick={() => setShowAddModal(true)} className="rounded-md bg-sky-600 text-white px-4 py-2 text-sm font-medium hover:bg-sky-500 transition-colors">
           Add Service
         </button>
@@ -176,7 +181,43 @@ function ServicesPage() {
 
       {!loading && services.length === 0 && !error && <p className="mt-8 text-slate-400">No active services yet — add your first one.</p>}
 
-      {!loading && services.length > 0 && <div className="mt-6 bg-white rounded-lg border border-slate-200 overflow-hidden">
+      
+      {!loading && services.length > 0 && <div className="mt-6 sm:hidden space-y-3">
+          {services.map(service => <div key={service.id} className="bg-white rounded-lg border border-slate-200 p-4">
+              <p className="font-medium text-slate-800">{service.name}</p>
+              {service.description && <p className="text-xs text-slate-400 mt-0.5">{service.description}</p>}
+
+              <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <div>
+                  <span className="text-slate-400 text-xs block">Duration</span>
+                  <span className="text-slate-700">{service.durationMinutes} min</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 text-xs block">Price</span>
+                  <span className="text-slate-700">{service.price ? `GHS ${service.price}` : "—"}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 text-xs block">Capacity</span>
+                  <span className="text-slate-700">{capacityLabel(service)}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 text-xs block">Branch</span>
+                  <span className="text-slate-700">{branchName(service.branchId)}</span>
+                </div>
+              </div>
+
+              <div className="mt-3 pt-3 border-t border-slate-100 flex gap-4">
+                <button onClick={() => setEditingService(service)} className="text-sm text-sky-600 hover:underline">
+                  Edit
+                </button>
+                <button onClick={() => handleDeactivate(service)} className="text-sm text-red-600 hover:underline">
+                  Deactivate
+                </button>
+              </div>
+            </div>)}
+        </div>}
+
+      {!loading && services.length > 0 && <div className="mt-6 bg-white rounded-lg border border-slate-200 overflow-hidden hidden sm:block">
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
