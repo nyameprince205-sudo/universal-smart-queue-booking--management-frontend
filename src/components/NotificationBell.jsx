@@ -25,7 +25,11 @@ function NotificationBell() {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
   const count = data?.count || 0;
   return <div className="relative" ref={ref}>
@@ -36,13 +40,14 @@ function NotificationBell() {
           </span>}
       </button>
 
-      {open && <div className="absolute left-0 top-full mt-2 w-72 bg-white rounded-md shadow-lg border border-slate-200 py-2 z-20">
+      
+      {open && <div className="fixed left-3 right-3 top-16 sm:absolute sm:left-0 sm:right-auto sm:top-full sm:mt-2 sm:w-72 bg-white rounded-md shadow-lg border border-slate-200 py-2 z-50">
           <p className="px-3 pb-2 text-xs font-medium text-slate-500 uppercase tracking-wide border-b border-slate-100">
             Notifications
           </p>
           {count === 0 ? <p className="px-3 py-3 text-sm text-slate-400">Nothing to report right now.</p> : <ul className="max-h-72 overflow-y-auto">
               {data.notifications.map((n, i) => <li key={i} className="px-3 py-2">
-                  <div className={`rounded-md border px-2 py-1.5 text-xs ${SEVERITY_STYLES[n.severity] || SEVERITY_STYLES.info}`}>
+                  <div className={`rounded-md border px-2 py-1.5 text-xs break-words ${SEVERITY_STYLES[n.severity] || SEVERITY_STYLES.info}`}>
                     {n.message}
                   </div>
                 </li>)}
