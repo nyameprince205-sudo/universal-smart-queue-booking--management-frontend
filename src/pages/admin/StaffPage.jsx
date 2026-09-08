@@ -105,9 +105,9 @@ function StaffPage() {
       setActioningId(null);
     }
   }
-  return <div className="p-8 max-w-4xl">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-800">Staff</h1>
+  return <div className="p-4 sm:p-8 max-w-4xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-semibold text-slate-800">Staff</h1>
         <button onClick={() => setShowAddModal(true)} className="rounded-md bg-sky-600 text-white px-4 py-2 text-sm font-medium hover:bg-sky-500 transition-colors">
           Add Staff
         </button>
@@ -119,7 +119,41 @@ function StaffPage() {
 
       {!loading && staff.length === 0 && !error && <p className="mt-8 text-slate-400">No staff accounts yet — add your first one.</p>}
 
-      {!loading && staff.length > 0 && <div className="mt-6 bg-white rounded-lg border border-slate-200 overflow-hidden">
+      
+      {!loading && staff.length > 0 && <div className="mt-6 sm:hidden space-y-3">
+          {staff.map(s => {
+        const isActive = s.status === "active";
+        return <div key={s.id} className={`rounded-lg border border-slate-200 p-4 ${isActive ? "bg-white" : "bg-slate-50"}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium text-slate-800 truncate">{s.name}</p>
+                    <p className="text-xs text-slate-400 break-all">{s.email}</p>
+                  </div>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${isActive ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-600"}`}>
+                    {isActive ? "Active" : "Deactivated"}
+                  </span>
+                </div>
+
+                <div className="mt-3 flex items-center gap-3 flex-wrap">
+                  <span className="text-sm text-slate-500">{s.branchName || "Not branch-scoped"}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${s.emailVerified ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
+                    {s.emailVerified ? "Verified" : "Pending"}
+                  </span>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-slate-100 flex gap-4">
+                  {isActive && <button onClick={() => setAssigningStaff(s)} className="text-sm font-medium text-sky-600 hover:underline">
+                      Assign
+                    </button>}
+                  <button onClick={() => handleToggleStatus(s)} disabled={actioningId === s.id} className={`text-sm font-medium hover:underline disabled:opacity-50 ${isActive ? "text-red-600" : "text-sky-600"}`}>
+                    {actioningId === s.id ? "Working…" : isActive ? "Deactivate" : "Reactivate"}
+                  </button>
+                </div>
+              </div>;
+      })}
+        </div>}
+
+      {!loading && staff.length > 0 && <div className="mt-6 bg-white rounded-lg border border-slate-200 overflow-hidden hidden sm:block">
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 text-slate-500">
               <tr>
