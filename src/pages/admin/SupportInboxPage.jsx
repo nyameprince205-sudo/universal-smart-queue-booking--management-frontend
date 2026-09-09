@@ -105,9 +105,9 @@ function SupportInboxPage({
     }
   }
   const currentTickets = view === "inbox" ? inboxTickets : myTickets;
-  return <div className="p-8 max-w-4xl">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-slate-800">{pageTitle || "Support Inbox"}</h1>
+  return <div className="p-4 sm:p-8 max-w-4xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <h1 className="text-xl sm:text-2xl font-semibold text-slate-800">{pageTitle || "Support Inbox"}</h1>
         {showEscalate && <button onClick={() => setShowEscalateForm(true)} className="rounded-md bg-amber-600 text-white px-4 py-2 text-sm font-medium hover:bg-amber-700 transition-colors">
             Escalate to Platform
           </button>}
@@ -126,7 +126,7 @@ function SupportInboxPage({
           ...f,
           message: e.target.value
         }))} rows={4} className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800 resize-none" />
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button type="submit" disabled={escalating} className="rounded-md bg-amber-600 text-white px-4 py-2 text-sm font-medium hover:bg-amber-700 disabled:opacity-50 transition-colors">
                 {escalating ? "Sending…" : "Send to Super Admin"}
               </button>
@@ -137,7 +137,7 @@ function SupportInboxPage({
           </form>
         </div>}
 
-      {showEscalate && <div className="flex gap-2 mb-4">
+      {showEscalate && <div className="flex gap-2 mb-4 flex-wrap">
           <button onClick={() => {
         setView("inbox");
         setActiveTicket(null);
@@ -152,7 +152,7 @@ function SupportInboxPage({
           </button>
         </div>}
 
-      {view === "inbox" && <div className="flex gap-2 mb-4">
+      {view === "inbox" && <div className="flex gap-2 mb-4 flex-wrap">
           {STATUS_FILTERS.map(s => <button key={s || "all"} onClick={() => {
         setStatusFilter(s);
         setActiveTicket(null);
