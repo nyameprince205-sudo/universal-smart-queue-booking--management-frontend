@@ -9,9 +9,13 @@ function BookingsReportTab({
   filters
 }) {
   const [report, setReport] = useState(null);
+  const [error, setError] = useState(null);
   useEffect(() => {
-    if (filters) getBookingReport(filters).then(setReport);
+    if (!filters) return;
+    setError(null);
+    getBookingReport(filters).then(setReport).catch(err => setError(err.response?.data?.error || "Couldn't load this report."));
   }, [filters]);
+  if (error) return <div className="mt-6 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>;
   if (!report) return <p className="mt-8 text-slate-400">Loading…</p>;
   return <div className="mt-6 space-y-6">
       <StatCard label="Total Bookings" value={report.totalBookings} />
@@ -39,12 +43,16 @@ function QueuePerformanceTab({
   filters
 }) {
   const [report, setReport] = useState(null);
+  const [error, setError] = useState(null);
   useEffect(() => {
-    if (filters) getQueuePerformanceReport(filters).then(setReport);
+    if (!filters) return;
+    setError(null);
+    getQueuePerformanceReport(filters).then(setReport).catch(err => setError(err.response?.data?.error || "Couldn't load this report."));
   }, [filters]);
+  if (error) return <div className="mt-6 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>;
   if (!report) return <p className="mt-8 text-slate-400">Loading…</p>;
   return <div className="mt-6 space-y-6">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard label="Tickets Served" value={report.totalTicketsServed} />
         <StatCard label="Avg Wait Time" value={formatDuration(report.averageWaitTimeSeconds)} />
         <StatCard label="Avg Service Time" value={formatDuration(report.averageServiceTimeSeconds)} />
@@ -75,19 +83,33 @@ function NoShowsTab({
   filters
 }) {
   const [report, setReport] = useState(null);
+  const [error, setError] = useState(null);
   useEffect(() => {
-    if (filters) getNoShowReport(filters).then(setReport);
+    if (!filters) return;
+    setError(null);
+    getNoShowReport(filters).then(setReport).catch(err => setError(err.response?.data?.error || "Couldn't load this report."));
   }, [filters]);
+  if (error) return <div className="mt-6 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>;
   if (!report) return <p className="mt-8 text-slate-400">Loading…</p>;
   return <div className="mt-6 space-y-6">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard label="Completed" value={report.completed} />
         <StatCard label="No-Shows" value={report.noShow} />
         <StatCard label="No-Show Rate" value={`${report.noShowRatePercent}%`} />
       </div>
       <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         <p className="text-sm font-medium text-slate-500 px-5 pt-5 pb-3">By Service</p>
-        <table className="w-full text-sm text-left">
+        <div className="sm:hidden space-y-3 px-5 pb-5">
+          {report.byService.map(s => <div key={s.serviceId} className="rounded-md border border-slate-200 p-3">
+              <p className="font-medium text-slate-800">{s.serviceName}</p>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-sm">
+                <div><span className="text-slate-400 text-xs block">Completed</span><span className="text-slate-700">{s.completed}</span></div>
+                <div><span className="text-slate-400 text-xs block">No-shows</span><span className="text-slate-700">{s.noShow}</span></div>
+                <div><span className="text-slate-400 text-xs block">Rate</span><span className="text-slate-700">{s.noShowRatePercent}%</span></div>
+              </div>
+            </div>)}
+        </div>
+        <table className="w-full text-sm text-left hidden sm:table">
           <thead className="bg-slate-50 text-slate-500">
             <tr>
               <th className="px-5 py-2 font-medium">Service</th>
@@ -111,14 +133,14 @@ function NoShowsTab({
 function ReportsPage() {
   const [activeTab, setActiveTab] = useState("Bookings");
   const [filters, setFilters] = useState(null);
-  return <div className="p-8 max-w-5xl">
+  return <div className="p-4 sm:p-8 max-w-5xl">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-semibold text-slate-800">Reports</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold text-slate-800">Reports</h1>
         <DateRangePicker onChange={setFilters} />
       </div>
 
-      <div className="mt-6 flex gap-1 border-b border-slate-200">
-        {TABS.map(tab => <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === tab ? "border-sky-600 text-sky-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
+      <div className="mt-6 flex gap-1 border-b border-slate-200 overflow-x-auto scrollbar-none">
+        {TABS.map(tab => <button key={tab} onClick={() => setActiveTab(tab)} className={`px-3 sm:px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap shrink-0 transition-colors ${activeTab === tab ? "border-sky-600 text-sky-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}>
             {tab}
           </button>)}
       </div>
