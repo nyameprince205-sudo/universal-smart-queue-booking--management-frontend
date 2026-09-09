@@ -108,8 +108,8 @@ function SubscriptionPage() {
   const recommendedPlanId = plans.length >= 3 ? plans[Math.floor(plans.length / 2)].id : null;
   const renewalDaysLeft = subscription?.endDate ? daysUntil(subscription.endDate) : null;
   const showRenewalReminder = renewalDaysLeft != null && renewalDaysLeft >= 0 && renewalDaysLeft <= RENEWAL_REMINDER_DAYS;
-  return <div className="p-8 max-w-4xl">
-      <h1 className="text-2xl font-semibold text-slate-800">Subscription</h1>
+  return <div className="p-4 sm:p-8 max-w-4xl">
+      <h1 className="text-xl sm:text-2xl font-semibold text-slate-800">Subscription</h1>
 
       {error && <div className="mt-6 rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
 
@@ -182,10 +182,9 @@ function SubscriptionPage() {
 
           {pendingReference && <div className="mt-6 rounded-md bg-amber-50 border border-amber-200 px-4 py-3">
               <p className="text-sm text-amber-800">
-                Checkout opened in a new tab. Complete the payment there, then come back and verify it here —
-                Paystack can't confirm this automatically on a local dev server.
+                Checkout opened in a new tab. Complete the payment there, then come back and confirm it here.
               </p>
-              <div className="mt-2 flex items-center gap-3">
+              <div className="mt-2 flex items-center gap-3 flex-wrap">
                 <button onClick={handleVerify} disabled={verifying} className="rounded-md bg-slate-800 text-white px-3 py-1.5 text-sm font-medium hover:bg-slate-700 disabled:opacity-50 transition-colors">
                   {verifying ? "Verifying…" : "I've completed payment — Verify now"}
                 </button>
@@ -273,7 +272,23 @@ function SubscriptionPage() {
           
           <div className="mt-8 bg-white rounded-lg border border-slate-200 overflow-hidden">
             <p className="text-sm font-medium text-slate-500 px-5 pt-5 pb-3">Payment History</p>
-            {payments.length === 0 ? <p className="text-sm text-slate-400 px-5 pb-5">No payments yet.</p> : <table className="w-full text-sm text-left">
+            {payments.length === 0 ? <p className="text-sm text-slate-400 px-5 pb-5">No payments yet.</p> : <>
+              
+              <div className="sm:hidden space-y-3 px-5 pb-5">
+                {payments.map(p => <div key={p.id} className="rounded-md border border-slate-200 p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-medium text-slate-800">{p.currency} {p.amount}</p>
+                        <p className="text-xs text-slate-400">{new Date(p.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium shrink-0 ${PAYMENT_STATUS_STYLES[p.status] || "bg-slate-100 text-slate-500"}`}>
+                        {p.status}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[11px] text-slate-400 break-all">{p.gatewayReference}</p>
+                  </div>)}
+              </div>
+              <table className="w-full text-sm text-left hidden sm:table">
                 <thead className="bg-slate-50 text-slate-500">
                   <tr>
                     <th className="px-5 py-2 font-medium">Date</th>
@@ -294,7 +309,8 @@ function SubscriptionPage() {
                       <td className="px-5 py-2 text-slate-400 text-xs">{p.gatewayReference}</td>
                     </tr>)}
                 </tbody>
-              </table>}
+              </table>
+              </>}
           </div>
         </>}
     </div>;
