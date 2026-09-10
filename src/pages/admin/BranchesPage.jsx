@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { listBranches, createBranch, updateBranch } from "../../api/branches";
 import Modal from "../../components/Modal";
+import BranchCounters from "../../components/BranchCounters";
 function BranchForm({
   initialValues,
   onSubmit,
@@ -127,6 +128,7 @@ function BranchesPage() {
                   {branch.status === "active" ? "Deactivate" : "Activate"}
                 </button>
               </div>
+              <BranchCounters branchId={branch.id} branchName={branch.name} />
             </div>)}
         </div>}
 
