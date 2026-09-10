@@ -68,7 +68,7 @@ function BranchCounters({
         </ul>}
 
       <form onSubmit={handleCreate} className="flex gap-2">
-        <input type="text" placeholder="New counter name…" value={newName} onChange={e => setNewName(e.target.value)} className="flex-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm text-slate-800" />
+        <input type="text" placeholder="e.g. Teller 1, Window 2, Table 5…" value={newName} onChange={e => setNewName(e.target.value)} className="flex-1 rounded-md border border-slate-300 px-2 py-1.5 text-sm text-slate-800" />
         <button type="submit" disabled={creating || !newName.trim()} className="rounded-md bg-slate-800 text-white px-3 py-1.5 text-sm font-medium hover:bg-slate-700 disabled:opacity-50 transition-colors whitespace-nowrap">
           {creating ? "Adding…" : "Add"}
         </button>
