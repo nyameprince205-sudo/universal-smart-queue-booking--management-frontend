@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { resetPassword } from "../../api/passwordReset";
+import PasswordInput from "../../components/PasswordInput";
 function validateStrength(password) {
   if (password.length < 8) return "Password must be at least 8 characters long";
   if (!/[a-zA-Z]/.test(password)) return "Password must contain at least one letter";
@@ -80,7 +81,7 @@ function ResetPasswordPage() {
             <label htmlFor="newPassword" className="block text-sm font-medium text-slate-700">
               New password
             </label>
-            <input id="newPassword" type="password" required autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500" />
+            <PasswordInput id="newPassword" required autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500" />
             <p className="mt-1 text-xs text-slate-400">At least 8 characters, with a letter and a number.</p>
           </div>
 
@@ -88,7 +89,7 @@ function ResetPasswordPage() {
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700">
               Confirm new password
             </label>
-            <input id="confirmPassword" type="password" required autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500" />
+            <PasswordInput id="confirmPassword" required autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500" />
           </div>
 
           <button type="submit" disabled={submitting} className="w-full rounded-md bg-sky-600 text-white py-2 font-medium hover:bg-sky-500 disabled:opacity-50 transition-colors">
