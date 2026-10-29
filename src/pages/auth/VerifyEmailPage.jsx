@@ -61,7 +61,6 @@ return () => {
   cancelled = true;
 };
 
-
 }, [token]);
 
 return ( <div className="surface-texture-subtle relative flex min-h-screen items-center justify-center overflow-hidden bg-warm-bg px-4 py-10 sm:px-6">
@@ -73,14 +72,6 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
       {/* Verifying state */}
       {status === "verifying" && (
         <>
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-50 text-sky-600">
-            <RefreshCw size={30} className="animate-spin" />
-          </div>
-
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-sky-700">
-            Account verification
-          </p>
-
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Verifying your email
           </h1>
@@ -99,14 +90,6 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
       {/* Success state */}
       {status === "success" && (
         <>
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
-            <CheckCircle2 size={34} strokeWidth={1.8} />
-          </div>
-
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700">
-            Verification complete
-          </p>
-
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Email verified!
           </h1>
@@ -127,6 +110,7 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
                 <p className="text-sm font-semibold text-emerald-900">
                   You're verified
                 </p>
+
                 <p className="mt-1 text-xs leading-5 text-emerald-800">
                   Your email verification step is complete.
                 </p>
@@ -154,14 +138,6 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
       {/* Error state */}
       {status === "error" && (
         <>
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
-            <AlertCircle size={32} strokeWidth={1.8} />
-          </div>
-
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-700">
-            Verification issue
-          </p>
-
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
             Verification unsuccessful
           </h1>
@@ -181,6 +157,7 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
                 <p className="text-sm font-semibold text-amber-900">
                   What you can do
                 </p>
+
                 <p className="mt-1 text-xs leading-5 text-amber-800">
                   Request a new verification email and open the latest link
                   sent to your inbox.

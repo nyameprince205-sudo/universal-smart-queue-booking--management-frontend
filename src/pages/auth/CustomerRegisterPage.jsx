@@ -11,6 +11,7 @@ import {
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
+
 import { useAuth } from "../../context/AuthContext";
 
 function CustomerRegisterPage() {
@@ -26,13 +27,12 @@ function CustomerRegisterPage() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Accept only Ghanaian phone numbers in these formats:
-  // 0241234567    -> 10 digits
-  // +233241234567 -> +233 followed by 9 digits
+  // Accept Ghanaian phone numbers in these formats:
+  // Local: 0241234567
+  // International: +233241234567
   function handlePhoneChange(e) {
     const value = e.target.value;
 
-    // Allow users to clear the field.
     if (value === "") {
       setPhone("");
       return;
@@ -70,6 +70,9 @@ function CustomerRegisterPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (submitting) return;
+
     setError(null);
 
     const trimmedName = name.trim();
@@ -109,8 +112,12 @@ function CustomerRegisterPage() {
       );
 
       const requestedPath = location.state?.from?.pathname;
+
       const destination =
-        requestedPath && requestedPath !== "/customer/register"
+        requestedPath &&
+        requestedPath !== "/customer/register" &&
+        requestedPath.startsWith("/") &&
+        !requestedPath.startsWith("//")
           ? requestedPath
           : "/";
 
@@ -139,20 +146,19 @@ function CustomerRegisterPage() {
   return (
     <div className="surface-texture-subtle relative flex min-h-screen items-center justify-center overflow-hidden bg-warm-bg px-4 py-10 sm:px-6">
       {/* Decorative background elements */}
-      <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-sky-200/30 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-indigo-200/30 blur-3xl" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-sky-200/30 blur-3xl"
+      />
+
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-indigo-200/30 blur-3xl"
+      />
 
       <div className="relative w-full max-w-md">
-        {/* Brand / heading */}
+        {/* Heading: decorative icon and badge removed */}
         <div className="mb-7 text-center">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-600 text-white shadow-lg shadow-sky-600/20">
-            <UserPlus size={29} strokeWidth={1.8} />
-          </div>
-
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-sky-700">
-            Welcome aboard
-          </p>
-
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">
             Create your account
           </h1>
@@ -168,9 +174,14 @@ function CustomerRegisterPage() {
           {error && (
             <div
               role="alert"
+              aria-live="polite"
               className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700"
             >
-              <AlertCircle className="mt-0.5 shrink-0" size={18} />
+              <AlertCircle
+                className="mt-0.5 shrink-0"
+                size={18}
+                aria-hidden="true"
+              />
               <p>{error}</p>
             </div>
           )}
@@ -189,7 +200,9 @@ function CustomerRegisterPage() {
                 <UserRound
                   size={18}
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  aria-hidden="true"
                 />
+
                 <input
                   id="name"
                   name="name"
@@ -218,7 +231,9 @@ function CustomerRegisterPage() {
                 <Phone
                   size={18}
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  aria-hidden="true"
                 />
+
                 <input
                   id="phone"
                   name="phone"
@@ -237,10 +252,7 @@ function CustomerRegisterPage() {
                 />
               </div>
 
-              <p
-                id="phone-help"
-                className="mt-1.5 text-xs text-slate-500"
-              >
+              <p id="phone-help" className="mt-1.5 text-xs text-slate-500">
                 Enter 10 digits starting with 0, or +233 followed by 9 digits.
               </p>
 
@@ -251,7 +263,9 @@ function CustomerRegisterPage() {
                     className={
                       phoneIsValid ? "text-emerald-600" : "text-slate-300"
                     }
+                    aria-hidden="true"
                   />
+
                   <span
                     className={`text-xs ${
                       phoneIsValid ? "text-emerald-700" : "text-slate-500"
@@ -279,7 +293,9 @@ function CustomerRegisterPage() {
                 <Mail
                   size={18}
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  aria-hidden="true"
                 />
+
                 <input
                   id="email"
                   name="email"
@@ -311,6 +327,7 @@ function CustomerRegisterPage() {
                 <LockKeyhole
                   size={18}
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  aria-hidden="true"
                 />
 
                 <input
@@ -332,6 +349,7 @@ function CustomerRegisterPage() {
                   onClick={() => setShowPassword((current) => !current)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md px-1 py-1 text-xs font-semibold text-sky-700 hover:text-sky-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                   aria-label={showPassword ? "Hide password" : "Show password"}
+                  disabled={submitting}
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -346,7 +364,9 @@ function CustomerRegisterPage() {
                         ? "text-emerald-600"
                         : "text-slate-300"
                     }
+                    aria-hidden="true"
                   />
+
                   <span
                     className={`text-xs ${
                       password.length >= 8
@@ -370,19 +390,23 @@ function CustomerRegisterPage() {
             >
               {submitting ? (
                 <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  <span
+                    aria-hidden="true"
+                    className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                  />
                   Creating your account...
                 </>
               ) : (
                 <>
-                  <UserPlus size={18} />
+                  <UserPlus size={18} aria-hidden="true" />
                   Create account
-                  <ArrowRight size={17} className="ml-1" />
+                  <ArrowRight size={17} className="ml-1" aria-hidden="true" />
                 </>
               )}
             </button>
           </form>
 
+          {/* Sign in link */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-slate-100" />
             <span className="text-xs text-slate-400">Already registered?</span>
@@ -399,7 +423,11 @@ function CustomerRegisterPage() {
 
         {/* Footer */}
         <div className="mt-6 flex items-center justify-center gap-2 text-center text-xs leading-5 text-slate-500">
-          <ShieldCheck size={16} className="shrink-0 text-emerald-600" />
+          <ShieldCheck
+            size={16}
+            className="shrink-0 text-emerald-600"
+            aria-hidden="true"
+          />
           <span>Your account details are handled securely.</span>
         </div>
 

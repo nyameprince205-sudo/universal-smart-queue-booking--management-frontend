@@ -92,3 +92,32 @@
     background-attachment: scroll;
   }
 }
+
+/* SmartQueue shared card hover and touch effects */
+.card-hover {
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease,
+    border-color 250ms ease;
+}
+
+/* Desktop and laptop: shrink when hovering */
+@media (hover: hover) and (pointer: fine) {
+  .card-hover:hover {
+    transform: scale(0.97);
+  }
+}
+
+/* Mobile and touchscreen: shrink while touching */
+@media (hover: none), (pointer: coarse) {
+  .card-hover:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .card-hover {
+    transition: none;
+  }
+}

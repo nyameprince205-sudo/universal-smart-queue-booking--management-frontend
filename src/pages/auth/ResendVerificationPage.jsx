@@ -5,7 +5,6 @@ ArrowLeft,
 ArrowRight,
 Mail,
 ShieldCheck,
-BadgeCheck,
 AlertCircle,
 CheckCircle2,
 } from "lucide-react";
@@ -49,14 +48,6 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
   <div className="relative w-full max-w-md">
     {/* Page heading */}
     <div className="mb-7 text-center">
-      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-600 text-white shadow-lg shadow-sky-600/20">
-        <BadgeCheck size={30} strokeWidth={1.8} />
-      </div>
-
-      <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-sky-700">
-        Account verification
-      </p>
-
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">
         Verify your email
       </h1>
@@ -91,10 +82,12 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
                 size={18}
                 className="mt-0.5 shrink-0 text-sky-600"
               />
+
               <div className="min-w-0">
                 <p className="text-xs font-medium text-sky-800">
                   Verification email
                 </p>
+
                 <p className="mt-1 break-all text-sm text-sky-700">
                   {email.trim()}
                 </p>

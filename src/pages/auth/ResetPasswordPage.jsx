@@ -3,7 +3,6 @@ import { useSearchParams, Link } from "react-router-dom";
 import {
 ArrowLeft,
 ArrowRight,
-KeyRound,
 ShieldCheck,
 CheckCircle2,
 AlertCircle,
@@ -91,12 +90,18 @@ const Requirement = ({ met, children }) => ( <div className="flex items-center g
 {met ? ( <CheckCircle2 size={15} className="shrink-0 text-emerald-600" />
 ) : ( <XCircle size={15} className="shrink-0 text-slate-300" />
 )}
-<span
-className={`text-xs ${
-          met ? "text-emerald-700" : "text-slate-500"
-        }`}
->
-{children} </span> </div>
+
+
+  <span
+    className={`text-xs ${
+      met ? "text-emerald-700" : "text-slate-500"
+    }`}
+  >
+    {children}
+  </span>
+</div>
+
+
 );
 
 // Invalid or missing token
@@ -144,7 +149,7 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
 if (success) {
 return ( <div className="surface-texture-subtle relative flex min-h-screen items-center justify-center overflow-hidden bg-warm-bg px-4 py-10"> <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-emerald-200/30 blur-3xl" /> <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-sky-200/30 blur-3xl" />
 
-
+```
     <div className="relative w-full max-w-md rounded-2xl border border-white/80 bg-white/95 p-7 text-center shadow-xl shadow-slate-900/5 sm:p-9">
       <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
         <CheckCircle2 size={32} />
@@ -169,10 +174,11 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
             size={19}
             className="mt-0.5 shrink-0 text-emerald-600"
           />
+
           <p className="text-xs leading-5 text-emerald-800">
-            For your security, use your new password the next time you sign
-            in. If your backend revokes existing sessions, other signed-in
-            devices will need to authenticate again.
+            For your security, use your new password the next time you
+            sign in. If your backend revokes existing sessions, other
+            signed-in devices will need to authenticate again.
           </p>
         </div>
       </div>
@@ -206,14 +212,6 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
 
   <div className="relative w-full max-w-md">
     <div className="mb-7 text-center">
-      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-600 text-white shadow-lg shadow-sky-600/20">
-        <KeyRound size={29} strokeWidth={1.8} />
-      </div>
-
-      <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-sky-700">
-        Account security
-      </p>
-
       <h1 className="text-3xl font-bold tracking-tight text-slate-900">
         Reset your password
       </h1>
@@ -305,6 +303,7 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
               ) : (
                 <AlertCircle size={14} />
               )}
+
               {passwordsMatch
                 ? "Passwords match"
                 : "Passwords do not match"}
@@ -345,7 +344,9 @@ return ( <div className="surface-texture-subtle relative flex min-h-screen items
 
     <div className="mt-6 flex items-center justify-center gap-2 text-center text-xs leading-5 text-slate-500">
       <ShieldCheck size={16} className="shrink-0 text-emerald-600" />
-      <span>Your password is protected by your account security settings.</span>
+      <span>
+        Your password is protected by your account security settings.
+      </span>
     </div>
   </div>
 </div>

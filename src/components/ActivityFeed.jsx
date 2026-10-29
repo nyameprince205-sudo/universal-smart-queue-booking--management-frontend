@@ -18,6 +18,9 @@ import {
 import { listRecentActivity } from "../api/activity";
 import { formatRelativeTime } from "../utils/formatRelativeTime";
 
+const CARD_HOVER =
+  "transition-[transform,box-shadow,border-color] duration-300 ease-out motion-reduce:transition-none [@media(hover:hover)]:hover:scale-[0.97]";
+
 const ACTION_CONFIG = {
   customer_joined_queue: {
     icon: Ticket,
@@ -126,7 +129,9 @@ function ActivityFeed() {
   const hasActivity = Array.isArray(activity) && activity.length > 0;
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+    <section
+      className={`overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm ${CARD_HOVER}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between gap-3 border-b border-stone-100 px-5 py-5 sm:px-6">
         <div className="flex items-center gap-3">
@@ -138,6 +143,7 @@ function ActivityFeed() {
             <h2 className="font-semibold tracking-tight text-stone-900">
               Recent activity
             </h2>
+
             <p className="mt-1 text-xs text-stone-500">
               The latest events from your workspace
             </p>
@@ -171,7 +177,10 @@ function ActivityFeed() {
               <p className="text-sm font-semibold text-red-900">
                 Unable to load activity
               </p>
-              <p className="mt-1 text-sm leading-5 text-red-700">{error}</p>
+
+              <p className="mt-1 text-sm leading-5 text-red-700">
+                {error}
+              </p>
 
               <button
                 type="button"
@@ -218,16 +227,16 @@ function ActivityFeed() {
               return (
                 <li
                   key={entry.id}
-                  className={`group flex items-start gap-3 py-4 first:pt-0 last:pb-0 sm:gap-4 ${
-                    index === 0 ? "" : ""
-                  }`}
+                  className={`group flex items-start gap-3 py-4 first:pt-0 last:pb-0 sm:gap-4 ${CARD_HOVER}`}
                 >
+                  {/* Activity icon */}
                   <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition group-hover:scale-105 ${config.color}`}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition duration-300 group-hover:scale-105 ${config.color}`}
                   >
                     <Icon className="h-[18px] w-[18px]" />
                   </div>
 
+                  {/* Activity details */}
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-semibold text-stone-800">
@@ -248,6 +257,7 @@ function ActivityFeed() {
 
                     <p className="mt-2 flex items-center gap-1.5 text-xs text-stone-400">
                       <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
                       {formatRelativeTime(entry.createdAt)}
                     </p>
                   </div>
@@ -272,7 +282,3 @@ function ActivityFeed() {
 }
 
 export default ActivityFeed;
-
-
-
-

@@ -2,10 +2,8 @@ import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
   UserRound,
-  ShieldCheck,
   ArrowRight,
   LockKeyhole,
-  CalendarCheck,
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
@@ -15,7 +13,6 @@ import PasswordInput from "../../components/PasswordInput";
 
 function CustomerLoginPage() {
   const { loginCustomer } = useAuth();
-
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,7 +41,7 @@ function CustomerLoginPage() {
         return;
       }
 
-      // 233 + 9 subscriber digits = 12 digits after "+".
+      // +233 followed by a maximum of 9 subscriber digits.
       setPhone(`+${digits.slice(0, 12)}`);
       setError(null);
       return;
@@ -75,12 +72,14 @@ function CustomerLoginPage() {
 
     setError(null);
 
-    if (!phone.trim()) {
+    const trimmedPhone = phone.trim();
+
+    if (!trimmedPhone) {
       setError("Please enter your phone number.");
       return;
     }
 
-    if (!isValidGhanaPhone(phone.trim())) {
+    if (!isValidGhanaPhone(trimmedPhone)) {
       setError(
         "Enter a valid Ghanaian phone number: 10 digits starting with 0, or +233 followed by 9 digits."
       );
@@ -95,7 +94,7 @@ function CustomerLoginPage() {
     setSubmitting(true);
 
     try {
-      await loginCustomer(phone.trim(), password);
+      await loginCustomer(trimmedPhone, password);
 
       const requestedDestination = location.state?.from?.pathname;
 
@@ -131,23 +130,8 @@ function CustomerLoginPage() {
       />
 
       <section className="relative w-full max-w-md">
-        {/* Header */}
-        <div className="mb-6 flex justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-600 text-white shadow-lg shadow-sky-600/20">
-            <CalendarCheck size={30} strokeWidth={1.8} aria-hidden="true" />
-          </div>
-        </div>
-
+        {/* Header: decorative icon and Customer Portal badge removed */}
         <div className="mb-8 text-center">
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-semibold text-slate-600">
-            <ShieldCheck
-              size={14}
-              className="text-emerald-600"
-              aria-hidden="true"
-            />
-            Customer Portal
-          </div>
-
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Welcome back
           </h1>

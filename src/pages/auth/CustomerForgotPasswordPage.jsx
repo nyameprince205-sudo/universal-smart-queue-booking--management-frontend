@@ -4,8 +4,6 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
-  KeyRound,
-  ShieldCheck,
   Phone,
   LoaderCircle,
   AlertCircle,
@@ -112,38 +110,8 @@ function CustomerForgotPasswordPage() {
       />
 
       <section className="relative w-full max-w-md">
-        {/* Icon */}
-        <div className="mb-6 flex justify-center">
-          <div
-            className={`flex h-16 w-16 items-center justify-center rounded-2xl shadow-lg ${
-              submitted
-                ? "bg-emerald-600 text-white shadow-emerald-600/20"
-                : "bg-sky-600 text-white shadow-sky-600/20"
-            }`}
-          >
-            {submitted ? (
-              <CheckCircle2
-                size={30}
-                strokeWidth={1.8}
-                aria-hidden="true"
-              />
-            ) : (
-              <KeyRound size={30} strokeWidth={1.8} aria-hidden="true" />
-            )}
-          </div>
-        </div>
-
         {/* Heading */}
         <div className="mb-8 text-center">
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-semibold text-slate-600">
-            <ShieldCheck
-              size={14}
-              className="text-emerald-600"
-              aria-hidden="true"
-            />
-            Account Recovery
-          </div>
-
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             {submitted ? "Check your next steps" : "Forgot your password?"}
           </h1>
@@ -214,7 +182,6 @@ function CustomerForgotPasswordPage() {
                       className="mt-0.5 shrink-0"
                       aria-hidden="true"
                     />
-
                     <p>{error}</p>
                   </div>
                 )}

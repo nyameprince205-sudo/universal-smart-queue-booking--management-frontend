@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Mail,
@@ -317,7 +318,7 @@ function ContactPage() {
                           htmlFor="contact-name"
                           className="block text-sm font-semibold text-stone-700"
                         >
-                          Full name <span className="text-red-600">*</span>
+                          Full name
                         </label>
 
                         <input
@@ -339,8 +340,7 @@ function ContactPage() {
                           htmlFor="contact-email"
                           className="block text-sm font-semibold text-stone-700"
                         >
-                          Email address{" "}
-                          <span className="text-red-600">*</span>
+                          Email address
                         </label>
 
                         <input
@@ -410,8 +410,7 @@ function ContactPage() {
                         htmlFor="contact-message"
                         className="block text-sm font-semibold text-stone-700"
                       >
-                        Your message{" "}
-                        <span className="text-red-600">*</span>
+                        Your message
                       </label>
 
                       <textarea
@@ -467,11 +466,6 @@ function ContactPage() {
                         </>
                       )}
                     </button>
-
-                    <p className="text-center text-xs leading-5 text-stone-400">
-                      Fields marked with <span className="text-red-600">*</span>{" "}
-                      are required.
-                    </p>
                   </form>
                 )}
               </div>

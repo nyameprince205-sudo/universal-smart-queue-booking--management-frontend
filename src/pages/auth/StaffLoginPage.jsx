@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { ShieldCheck, Building2, ArrowRight, LockKeyhole } from "lucide-react";
+import { ArrowRight, LockKeyhole } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
 import { getHomeRouteForRole } from "../../routes/roleHomeRoutes";
@@ -65,24 +65,8 @@ return ( <main className="relative flex min-h-screen items-center justify-center
   />
 
   <section className="relative w-full max-w-md">
-    {/* Brand / icon */}
-    <div className="mb-6 flex justify-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-lg shadow-slate-900/10">
-        <Building2 size={30} strokeWidth={1.7} aria-hidden="true" />
-      </div>
-    </div>
-
     {/* Heading */}
     <div className="mb-8 text-center">
-      <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-xs font-semibold text-slate-600">
-        <ShieldCheck
-          size={14}
-          className="text-emerald-600"
-          aria-hidden="true"
-        />
-        Secure Staff Portal
-      </div>
-
       <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
         Staff &amp; Admin Login
       </h1>

@@ -12,7 +12,6 @@ import {
   Send,
   Users,
 } from "lucide-react";
-
 import { submitOrganizationRequest } from "../../api/organizationRequests";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 import Navbar from "../../components/Navbar";
@@ -45,36 +44,30 @@ function RequestRegistrationPage() {
     }));
   }
 
-  // Accept only Ghanaian local or international phone formats.
+  // Accept Ghanaian local or international phone formats.
   function handlePhoneChange(e) {
     const value = e.target.value;
 
-    // Allow the user to clear the phone field.
     if (value === "") {
       update("phone", "");
       setError(null);
       return;
     }
 
-    // International format: +233 followed by 9 digits.
     if (value.startsWith("+")) {
       const digits = value.slice(1).replace(/\D/g, "");
 
-      // Reject international numbers that do not start with +233.
       if (!digits.startsWith("233")) {
         return;
       }
 
-      // 233 plus 9 digits, with the leading + = 13 characters.
       update("phone", `+${digits.slice(0, 12)}`);
       setError(null);
       return;
     }
 
-    // Local format: 0 followed by 9 digits.
     const digits = value.replace(/\D/g, "").slice(0, 10);
 
-    // Reject local numbers that do not start with 0.
     if (digits.length > 0 && !digits.startsWith("0")) {
       return;
     }
@@ -93,7 +86,6 @@ function RequestRegistrationPage() {
 
     const phone = form.phone.trim();
 
-    // Validate the phone number before making the API request.
     if (!isValidGhanaPhone(phone)) {
       setError(
         "Enter a valid Ghanaian phone number: 0241234567 or +233241234567."
@@ -104,7 +96,6 @@ function RequestRegistrationPage() {
     setSubmitting(true);
 
     try {
-      // Preserve the existing API integration and form data structure.
       await submitOrganizationRequest(form);
       setSubmitted(true);
     } catch (err) {
@@ -128,7 +119,6 @@ function RequestRegistrationPage() {
     </span>
   );
 
-  // Successful submission screen.
   if (submitted) {
     return (
       <div className="min-h-screen bg-[#F7F8F5] font-sans">
@@ -168,12 +158,10 @@ function RequestRegistrationPage() {
                   size={18}
                   className="mt-0.5 shrink-0 text-[#47745A]"
                 />
-
                 <div className="min-w-0">
                   <p className="text-xs text-[#68736B]">
                     Business name
                   </p>
-
                   <p className="mt-1 break-words text-sm font-semibold text-[#202923]">
                     {form.businessName}
                   </p>
@@ -185,12 +173,10 @@ function RequestRegistrationPage() {
                   size={18}
                   className="mt-0.5 shrink-0 text-[#47745A]"
                 />
-
                 <div className="min-w-0">
                   <p className="text-xs text-[#68736B]">
                     Contact phone
                   </p>
-
                   <p className="mt-1 break-words text-sm font-semibold text-[#202923]">
                     {form.phone}
                   </p>
@@ -202,12 +188,10 @@ function RequestRegistrationPage() {
                   size={18}
                   className="mt-0.5 shrink-0 text-[#47745A]"
                 />
-
                 <div className="min-w-0">
                   <p className="text-xs text-[#68736B]">
                     Contact email
                   </p>
-
                   <p className="mt-1 break-all text-sm font-semibold text-[#202923]">
                     {form.email}
                   </p>
@@ -300,14 +284,6 @@ function RequestRegistrationPage() {
                     Complete the form below. Our team will contact you
                     to discuss the next steps.
                   </p>
-
-                  <p className="mt-3 text-xs text-[#68736B]">
-                    Fields marked with{" "}
-                    <span className="font-semibold text-red-600">
-                      *
-                    </span>{" "}
-                    are required.
-                  </p>
                 </div>
               </div>
             </div>
@@ -325,7 +301,6 @@ function RequestRegistrationPage() {
                   <p className="font-semibold">
                     We couldn't submit your request
                   </p>
-
                   <p className="mt-1">{error}</p>
                 </div>
               )}
@@ -344,7 +319,6 @@ function RequestRegistrationPage() {
                     >
                       Business information
                     </h3>
-
                     <p className="mt-1 text-xs text-[#7B857C]">
                       Tell us about your organization.
                     </p>
@@ -357,10 +331,8 @@ function RequestRegistrationPage() {
                       htmlFor="req-business-name"
                       className={labelClass}
                     >
-                      Business name{" "}
-                      <span className="text-red-600">*</span>
+                      Business name
                     </label>
-
                     <input
                       id="req-business-name"
                       name="businessName"
@@ -381,10 +353,8 @@ function RequestRegistrationPage() {
                         htmlFor="req-owner-name"
                         className={labelClass}
                       >
-                        Owner or contact name{" "}
-                        <span className="text-red-600">*</span>
+                        Owner or contact name
                       </label>
-
                       <input
                         id="req-owner-name"
                         name="ownerName"
@@ -404,10 +374,8 @@ function RequestRegistrationPage() {
                         htmlFor="req-business-type"
                         className={labelClass}
                       >
-                        Business type{" "}
-                        <span className="text-red-600">*</span>
+                        Business type
                       </label>
-
                       <input
                         id="req-business-type"
                         name="businessType"
@@ -441,7 +409,6 @@ function RequestRegistrationPage() {
                     >
                       Contact information
                     </h3>
-
                     <p className="mt-1 text-xs text-[#7B857C]">
                       How should our team reach you?
                     </p>
@@ -454,10 +421,8 @@ function RequestRegistrationPage() {
                       htmlFor="req-phone"
                       className={labelClass}
                     >
-                      Phone number{" "}
-                      <span className="text-red-600">*</span>
+                      Phone number
                     </label>
-
                     <input
                       id="req-phone"
                       name="phone"
@@ -472,7 +437,6 @@ function RequestRegistrationPage() {
                       aria-describedby="req-phone-hint"
                       className={inputClass}
                     />
-
                     <p
                       id="req-phone-hint"
                       className="mt-2 text-xs leading-5 text-[#7B857C]"
@@ -487,10 +451,8 @@ function RequestRegistrationPage() {
                       htmlFor="req-email"
                       className={labelClass}
                     >
-                      Email address{" "}
-                      <span className="text-red-600">*</span>
+                      Email address
                     </label>
-
                     <input
                       id="req-email"
                       name="email"
@@ -525,7 +487,6 @@ function RequestRegistrationPage() {
                     >
                       Business location
                     </h3>
-
                     <p className="mt-1 text-xs text-[#7B857C]">
                       Help customers identify your business.
                     </p>
@@ -540,7 +501,6 @@ function RequestRegistrationPage() {
                     >
                       Street address {optionalLabel}
                     </label>
-
                     <input
                       id="req-address"
                       name="address"
@@ -562,7 +522,6 @@ function RequestRegistrationPage() {
                       >
                         City or town {optionalLabel}
                       </label>
-
                       <input
                         id="req-city"
                         name="city"
@@ -583,7 +542,6 @@ function RequestRegistrationPage() {
                       >
                         Region {optionalLabel}
                       </label>
-
                       <input
                         id="req-region"
                         name="region"
@@ -617,7 +575,6 @@ function RequestRegistrationPage() {
                     >
                       Additional details
                     </h3>
-
                     <p className="mt-1 text-xs text-[#7B857C]">
                       Share any other information that may help.
                     </p>
@@ -632,7 +589,6 @@ function RequestRegistrationPage() {
                     >
                       Number of branches {optionalLabel}
                     </label>
-
                     <input
                       id="req-branches"
                       name="numberOfBranches"
@@ -655,7 +611,6 @@ function RequestRegistrationPage() {
                     >
                       Additional notes {optionalLabel}
                     </label>
-
                     <textarea
                       id="req-notes"
                       name="additionalNotes"
