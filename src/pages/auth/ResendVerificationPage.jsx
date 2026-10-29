@@ -1,51 +1,203 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import {
+ArrowLeft,
+ArrowRight,
+Mail,
+ShieldCheck,
+BadgeCheck,
+AlertCircle,
+CheckCircle2,
+} from "lucide-react";
 import { resendVerification } from "../../api/passwordReset";
-function ResendVerificationPage() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      await resendVerification(email);
-    } finally {
-      setSubmitting(false);
-      setSubmitted(true);
-    }
-  }
-  return <div className="min-h-screen flex items-center justify-center bg-warm-bg surface-texture-subtle px-4">
-      <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-semibold text-slate-800 text-center">Resend Verification Email</h1>
-        <p className="mt-1 text-sm text-slate-500 text-center">
-          Enter your email and we'll resend the verification link if needed.
-        </p>
 
-        {submitted ? <div className="mt-8 rounded-md bg-sky-50 border border-sky-200 px-4 py-4 text-center">
-            <p className="text-sm text-sky-800">
-              If an account exists and needs verification, a new verification email has been sent.
-            </p>
-            <Link to="/login" className="mt-3 inline-block text-sm text-sky-600 hover:underline">
-              Back to sign in
-            </Link>
-          </div> : <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-                Email
-              </label>
-              <input id="email" type="email" required autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500" />
-            </div>
-            <button type="submit" disabled={submitting} className="w-full rounded-md bg-slate-800 text-white py-2 font-medium hover:bg-slate-700 disabled:opacity-50 transition-colors">
-              {submitting ? "Sending…" : "Resend verification email"}
-            </button>
-            <p className="text-center text-sm text-slate-500">
-              <Link to="/login" className="text-sky-600 hover:underline">
-                Back to sign in
-              </Link>
-            </p>
-          </form>}
-      </div>
-    </div>;
+function ResendVerificationPage() {
+const [email, setEmail] = useState("");
+const [submitted, setSubmitted] = useState(false);
+const [submitting, setSubmitting] = useState(false);
+const [error, setError] = useState("");
+
+async function handleSubmit(e) {
+e.preventDefault();
+
+
+setError("");
+setSubmitting(true);
+
+try {
+  await resendVerification(email.trim());
+  setSubmitted(true);
+} catch (err) {
+  setError(
+    err.response?.data?.error ||
+      "We couldn't process your request right now. Please try again."
+  );
+} finally {
+  setSubmitting(false);
 }
+
+
+}
+
+const inputClass =
+"w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 disabled:cursor-not-allowed disabled:bg-slate-50";
+
+return ( <div className="surface-texture-subtle relative flex min-h-screen items-center justify-center overflow-hidden bg-warm-bg px-4 py-10 sm:px-6">
+{/* Decorative background */} <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-sky-200/30 blur-3xl" /> <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-indigo-200/30 blur-3xl" />
+
+
+  <div className="relative w-full max-w-md">
+    {/* Page heading */}
+    <div className="mb-7 text-center">
+      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-600 text-white shadow-lg shadow-sky-600/20">
+        <BadgeCheck size={30} strokeWidth={1.8} />
+      </div>
+
+      <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-sky-700">
+        Account verification
+      </p>
+
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+        Verify your email
+      </h1>
+
+      <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-slate-500">
+        Need another verification link? Enter your email address and we'll
+        help you complete the process.
+      </p>
+    </div>
+
+    {/* Main card */}
+    <div className="rounded-2xl border border-white/80 bg-white/95 p-6 shadow-xl shadow-slate-900/5 backdrop-blur sm:p-8">
+      {submitted ? (
+        <div className="py-3 text-center">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+            <CheckCircle2 size={30} />
+          </div>
+
+          <h2 className="text-xl font-bold text-slate-900">
+            Check your inbox
+          </h2>
+
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            If an account exists and still needs verification, a new
+            verification email has been sent. Please check your inbox and
+            spam folder.
+          </p>
+
+          <div className="mt-5 rounded-xl border border-sky-100 bg-sky-50 p-3 text-left">
+            <div className="flex items-start gap-3">
+              <Mail
+                size={18}
+                className="mt-0.5 shrink-0 text-sky-600"
+              />
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-sky-800">
+                  Verification email
+                </p>
+                <p className="mt-1 break-all text-sm text-sky-700">
+                  {email.trim()}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Link
+            to="/login"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-500/20"
+          >
+            Continue to sign in
+            <ArrowRight size={17} />
+          </Link>
+        </div>
+      ) : (
+        <>
+          {error && (
+            <div
+              role="alert"
+              className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-700"
+            >
+              <AlertCircle size={18} className="mt-0.5 shrink-0" />
+              <p>{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-2 block text-sm font-semibold text-slate-700"
+              >
+                Email address
+              </label>
+
+              <div className="relative">
+                <Mail
+                  size={18}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                />
+
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClass}
+                  disabled={submitting}
+                />
+              </div>
+
+              <p className="mt-2 text-xs leading-5 text-slate-500">
+                Use the email address you registered with.
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3.5 text-sm font-semibold text-white shadow-md shadow-sky-600/15 transition hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  Sending verification email...
+                </>
+              ) : (
+                <>
+                  Resend verification email
+                  <ArrowRight size={17} />
+                </>
+              )}
+            </button>
+          </form>
+        </>
+      )}
+
+      <div className="mt-6 border-t border-slate-100 pt-5">
+        <Link
+          to="/login"
+          className="flex items-center justify-center gap-2 text-sm font-medium text-slate-500 transition hover:text-sky-700"
+        >
+          <ArrowLeft size={16} />
+          Return to staff sign in
+        </Link>
+      </div>
+    </div>
+
+    {/* Security note */}
+    <div className="mt-6 flex items-center justify-center gap-2 text-center text-xs leading-5 text-slate-500">
+      <ShieldCheck size={16} className="shrink-0 text-emerald-600" />
+      <span>Your account verification is handled securely.</span>
+    </div>
+  </div>
+</div>
+
+
+);
+}
+
 export default ResendVerificationPage;
