@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Sora:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+--color-forest-50: #EAF3EE;
+--color-forest-100: #C5DFD1;
+--color-forest-400: #2D7A54;
+--color-forest-600: #1B5E3F;
+--color-forest-700: #14492F;
+--color-forest-900: #0D2F1F;
+
+--color-gold-50: #FDF4E3;
+--color-gold-100: #F0DCAE;
+--color-gold-400: #D9AB3F;
+--color-gold-600: #C9962C;
+--color-gold-800: #8C6D1F;
+
+--color-warm-bg: #FAF7F0;
+--color-warm-card: #FFFFFF;
+--color-warm-border: #E5DFD1;
+--color-warm-ink: #1F1B16;
+--color-warm-muted: #8C8577;
+--color-warm-muted-2: #6B6459;
+
+--font-display: "Fraunces", serif;
+--font-sans: "Sora", sans-serif;
+}
+
+/* Public page background textures */
+.surface-texture {
+background-image:
+radial-gradient(circle at 15% 12%, rgba(201, 150, 44, 0.10), transparent 42%),
+radial-gradient(circle at 85% 65%, rgba(27, 94, 63, 0.09), transparent 45%);
+background-attachment: fixed;
+}
+
+.surface-texture-subtle {
+background-image:
+radial-gradient(circle at 88% 8%, rgba(201, 150, 44, 0.07), transparent 40%);
+background-attachment: fixed;
+}
+
+/* Card top-edge accent */
+.card-accent {
+border-top-width: 2px;
+border-top-left-radius: 0;
+border-top-right-radius: 0;
+}
+
+/* Sticky navigation elevation */
+.chrome-shadow {
+box-shadow: 0 1px 2px rgba(31, 27, 22, 0.04), 0 2px 8px rgba(31, 27, 22, 0.03);
+}
+
+/* Shared card and button interaction */
+.card-hover,
+.touch-feedback {
+transition:
+transform 180ms ease,
+box-shadow 180ms ease,
+border-color 180ms ease;
+-webkit-tap-highlight-color: transparent;
+}
+
+/* Desktop and laptop: subtle shrink on hover */
+@media (hover: hover) and (pointer: fine) {
+.card-hover:hover,
+.touch-feedback:hover {
+transform: scale(0.98);
+}
+}
+
+/* Phones and touchscreens: shrink while the finger is pressing */
+@media (hover: none), (pointer: coarse) {
+.card-hover:active,
+.touch-feedback:active {
+transform: scale(0.97);
+}
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+.surface-texture,
+.surface-texture-subtle {
+background-attachment: scroll;
+}
+
+.card-hover,
+.touch-feedback {
+transition: none;
+}
+}
