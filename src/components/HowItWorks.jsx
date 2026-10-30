@@ -1,3 +1,4 @@
+
 import {
   Search,
   CalendarCheck,
@@ -5,9 +6,6 @@ import {
   CheckCircle2,
   ArrowRight,
 } from "lucide-react";
-
-const CARD_HOVER =
-  "transition-[transform,box-shadow,border-color] duration-300 ease-out motion-reduce:transition-none [@media(hover:hover)]:hover:scale-[0.97]";
 
 const STEPS = [
   {
@@ -36,6 +34,9 @@ const STEPS = [
   },
 ];
 
+const CARD_INTERACTION =
+  "touch-manipulation transition-[transform,box-shadow,border-color] duration-200 ease-out active:scale-[0.97] active:shadow-md [@media(hover:hover)]:hover:scale-[0.97] [@media(hover:hover)]:hover:-translate-y-1 [@media(hover:hover)]:hover:shadow-lg motion-reduce:transition-none";
+
 function HowItWorks() {
   return (
     <section
@@ -43,6 +44,7 @@ function HowItWorks() {
       aria-labelledby="how-heading"
     >
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+
         {/* Section heading */}
         <div className="mx-auto max-w-2xl text-center">
           <h2
@@ -61,9 +63,25 @@ function HowItWorks() {
         </div>
 
         {/* Information cards */}
-        <ol className="relative mt-14 grid gap-6 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4 lg:gap-5">
+        <ol
+          className="
+            relative mt-10
+            flex snap-x snap-mandatory gap-4
+            overflow-x-auto overscroll-x-contain
+            scroll-smooth touch-pan-x
+            pb-5
+            [-webkit-overflow-scrolling:touch]
+            sm:mt-14 sm:grid sm:grid-cols-2 sm:gap-6
+            sm:overflow-visible sm:pb-0
+            lg:mt-16 lg:grid-cols-4 lg:gap-5
+          "
+          aria-label="Four steps explaining how SmartQueue works. Swipe horizontally on mobile."
+        >
           {STEPS.map(({ icon: Icon, title, text, footer }, index) => (
-            <li key={title} className="relative flex">
+            <li
+              key={title}
+              className="relative flex w-[82vw] max-w-[20rem] shrink-0 snap-start sm:w-auto sm:max-w-none sm:shrink"
+            >
               {/* Connecting line on desktop */}
               {index < STEPS.length - 1 && (
                 <div
@@ -74,11 +92,15 @@ function HowItWorks() {
 
               {/* Information card */}
               <article
-                className={`card-hover group relative flex w-full flex-col rounded-2xl border border-stone-200 bg-white p-6 shadow-sm hover:-translate-y-1 hover:border-emerald-200 hover:shadow-lg hover:shadow-emerald-950/5 sm:p-7 ${CARD_HOVER}`}
+                className={`group relative flex w-full flex-col rounded-2xl border border-stone-200 bg-white p-6 shadow-sm hover:border-emerald-200 sm:p-7 ${CARD_INTERACTION}`}
               >
-                {/* Icon */}
-                <div className="flex items-center justify-end">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800 transition duration-300 group-hover:bg-emerald-800 group-hover:text-white">
+                {/* Step number and icon */}
+                <div className="flex items-center justify-between">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-xs font-bold text-emerald-800">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800 transition-colors duration-200 group-hover:bg-emerald-800 group-hover:text-white">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </div>
                 </div>
@@ -110,6 +132,11 @@ function HowItWorks() {
           ))}
         </ol>
 
+        {/* Mobile swipe hint */}
+        <p className="mt-2 text-center text-xs text-stone-400 sm:hidden">
+          Swipe left to explore all four steps →
+        </p>
+
         {/* Closing message */}
         <div className="mt-10 flex flex-col items-center justify-center gap-2 text-center sm:flex-row">
           <CheckCircle2
@@ -127,3 +154,4 @@ function HowItWorks() {
 }
 
 export default HowItWorks;
+

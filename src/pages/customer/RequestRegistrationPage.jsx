@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+
 import {
   ArrowLeft,
   ArrowRight,
@@ -12,6 +13,7 @@ import {
   Send,
   Users,
 } from "lucide-react";
+
 import { submitOrganizationRequest } from "../../api/organizationRequests";
 import useDocumentTitle from "../../hooks/useDocumentTitle";
 import Navbar from "../../components/Navbar";
@@ -19,6 +21,20 @@ import Footer from "../../components/Footer";
 
 function RequestRegistrationPage() {
   useDocumentTitle("Request Organization Registration");
+
+  // Scroll to the registration form when the URL contains the form hash.
+  useEffect(() => {
+    if (window.location.hash !== "#registration-form") return;
+
+    const timer = window.setTimeout(() => {
+      document.getElementById("registration-form")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 150);
+
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const [form, setForm] = useState({
     businessName: "",
@@ -119,6 +135,7 @@ function RequestRegistrationPage() {
     </span>
   );
 
+  // SUCCESS SCREEN
   if (submitted) {
     return (
       <div className="min-h-screen bg-[#F7F8F5] font-sans">
@@ -158,10 +175,12 @@ function RequestRegistrationPage() {
                   size={18}
                   className="mt-0.5 shrink-0 text-[#47745A]"
                 />
+
                 <div className="min-w-0">
                   <p className="text-xs text-[#68736B]">
                     Business name
                   </p>
+
                   <p className="mt-1 break-words text-sm font-semibold text-[#202923]">
                     {form.businessName}
                   </p>
@@ -173,10 +192,12 @@ function RequestRegistrationPage() {
                   size={18}
                   className="mt-0.5 shrink-0 text-[#47745A]"
                 />
+
                 <div className="min-w-0">
                   <p className="text-xs text-[#68736B]">
                     Contact phone
                   </p>
+
                   <p className="mt-1 break-words text-sm font-semibold text-[#202923]">
                     {form.phone}
                   </p>
@@ -188,10 +209,12 @@ function RequestRegistrationPage() {
                   size={18}
                   className="mt-0.5 shrink-0 text-[#47745A]"
                 />
+
                 <div className="min-w-0">
                   <p className="text-xs text-[#68736B]">
                     Contact email
                   </p>
+
                   <p className="mt-1 break-all text-sm font-semibold text-[#202923]">
                     {form.email}
                   </p>
@@ -201,7 +224,7 @@ function RequestRegistrationPage() {
 
             <Link
               to="/"
-              className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#103B2B] px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#154D38] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#47745A] focus-visible:ring-offset-2 sm:w-auto"
+              className="mt-7 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#103B2B] px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#154D38] hover:shadow-md active:scale-[0.98] touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#47745A] focus-visible:ring-offset-2 sm:w-auto"
             >
               Back to Home
               <ArrowRight size={17} />
@@ -214,6 +237,7 @@ function RequestRegistrationPage() {
     );
   }
 
+  // REGISTRATION FORM PAGE
   return (
     <div className="min-h-screen bg-[#F7F8F5] font-sans">
       <Navbar />
@@ -238,6 +262,7 @@ function RequestRegistrationPage() {
 
           <h1 className="mt-6 font-display text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
             Bring Your Business
+
             <span className="mt-2 block text-[#E0B957]">
               Closer to Your Customers.
             </span>
@@ -252,7 +277,10 @@ function RequestRegistrationPage() {
       </section>
 
       {/* Registration form area */}
-      <main className="relative isolate overflow-hidden px-4 py-10 sm:py-14">
+      <main
+        id="registration-form"
+        className="relative isolate scroll-mt-24 overflow-hidden px-4 py-10 sm:py-14"
+      >
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-72 w-[38rem] max-w-full -translate-x-1/2 rounded-full bg-[#DDE9DE]/40 blur-3xl"
@@ -261,7 +289,7 @@ function RequestRegistrationPage() {
         <div className="mx-auto max-w-3xl">
           <Link
             to="/"
-            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#47745A] transition-colors hover:text-[#103B2B] focus-visible:outline-none focus-visible:underline"
+            className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#47745A] transition-colors hover:text-[#103B2B] active:scale-[0.98] touch-manipulation focus-visible:outline-none focus-visible:underline"
           >
             <ArrowLeft size={16} />
             Back to Home
@@ -301,6 +329,7 @@ function RequestRegistrationPage() {
                   <p className="font-semibold">
                     We couldn't submit your request
                   </p>
+
                   <p className="mt-1">{error}</p>
                 </div>
               )}
@@ -319,6 +348,7 @@ function RequestRegistrationPage() {
                     >
                       Business information
                     </h3>
+
                     <p className="mt-1 text-xs text-[#7B857C]">
                       Tell us about your organization.
                     </p>
@@ -333,6 +363,7 @@ function RequestRegistrationPage() {
                     >
                       Business name
                     </label>
+
                     <input
                       id="req-business-name"
                       name="businessName"
@@ -355,6 +386,7 @@ function RequestRegistrationPage() {
                       >
                         Owner or contact name
                       </label>
+
                       <input
                         id="req-owner-name"
                         name="ownerName"
@@ -376,6 +408,7 @@ function RequestRegistrationPage() {
                       >
                         Business type
                       </label>
+
                       <input
                         id="req-business-type"
                         name="businessType"
@@ -409,6 +442,7 @@ function RequestRegistrationPage() {
                     >
                       Contact information
                     </h3>
+
                     <p className="mt-1 text-xs text-[#7B857C]">
                       How should our team reach you?
                     </p>
@@ -423,6 +457,7 @@ function RequestRegistrationPage() {
                     >
                       Phone number
                     </label>
+
                     <input
                       id="req-phone"
                       name="phone"
@@ -437,6 +472,7 @@ function RequestRegistrationPage() {
                       aria-describedby="req-phone-hint"
                       className={inputClass}
                     />
+
                     <p
                       id="req-phone-hint"
                       className="mt-2 text-xs leading-5 text-[#7B857C]"
@@ -453,6 +489,7 @@ function RequestRegistrationPage() {
                     >
                       Email address
                     </label>
+
                     <input
                       id="req-email"
                       name="email"
@@ -487,6 +524,7 @@ function RequestRegistrationPage() {
                     >
                       Business location
                     </h3>
+
                     <p className="mt-1 text-xs text-[#7B857C]">
                       Help customers identify your business.
                     </p>
@@ -501,6 +539,7 @@ function RequestRegistrationPage() {
                     >
                       Street address {optionalLabel}
                     </label>
+
                     <input
                       id="req-address"
                       name="address"
@@ -522,6 +561,7 @@ function RequestRegistrationPage() {
                       >
                         City or town {optionalLabel}
                       </label>
+
                       <input
                         id="req-city"
                         name="city"
@@ -542,6 +582,7 @@ function RequestRegistrationPage() {
                       >
                         Region {optionalLabel}
                       </label>
+
                       <input
                         id="req-region"
                         name="region"
@@ -575,6 +616,7 @@ function RequestRegistrationPage() {
                     >
                       Additional details
                     </h3>
+
                     <p className="mt-1 text-xs text-[#7B857C]">
                       Share any other information that may help.
                     </p>
@@ -589,6 +631,7 @@ function RequestRegistrationPage() {
                     >
                       Number of branches {optionalLabel}
                     </label>
+
                     <input
                       id="req-branches"
                       name="numberOfBranches"
@@ -611,6 +654,7 @@ function RequestRegistrationPage() {
                     >
                       Additional notes {optionalLabel}
                     </label>
+
                     <textarea
                       id="req-notes"
                       name="additionalNotes"
@@ -638,7 +682,7 @@ function RequestRegistrationPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#103B2B] px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#154D38] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#47745A] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+                  className="inline-flex min-h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-full bg-[#103B2B] px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#154D38] hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#47745A] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
                 >
                   {submitting ? (
                     <>
@@ -678,4 +722,3 @@ function RequestRegistrationPage() {
 }
 
 export default RequestRegistrationPage;
-
